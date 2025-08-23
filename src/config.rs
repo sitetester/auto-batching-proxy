@@ -13,7 +13,7 @@ pub struct Args {
     #[arg(long)]
     pub max_wait_time_ms: Option<u64>,
 
-    /// Maximum batch size, check your model's limits - e.g., all-MiniLM-L6-v2 supports up to 32)
+    /// Maximum batch size, check your model's limits - e.g., all-MiniLM-L6-v2 supports up to 32
     #[arg(long)]
     pub max_batch_size: Option<usize>,
 
