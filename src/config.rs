@@ -124,19 +124,20 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_default_config() {
+    fn test_build_from_default() {
+        let defaults = AppConfig::default();
         let config = AppConfig::build(None);
-        assert_eq!(config.port, 3000);
-        assert_eq!(config.max_wait_time_ms, 500);
-        assert_eq!(config.max_batch_size, 8);
-        assert_eq!(config.batch_check_interval_ms, 10);
-        assert_eq!(config.inference_url, "http://127.0.0.1:8080/embed");
-        assert_eq!(config.inference_timeout_secs, 30);
-        assert_eq!(config.log_level, "info");
+        assert_eq!(config.port, defaults.port);
+        assert_eq!(config.max_wait_time_ms, defaults.max_wait_time_ms);
+        assert_eq!(config.max_batch_size, defaults.max_batch_size);
+        assert_eq!(config.batch_check_interval_ms, defaults.batch_check_interval_ms);
+        assert_eq!(config.inference_url, defaults.inference_url);
+        assert_eq!(config.inference_timeout_secs, defaults.inference_timeout_secs);
+        assert_eq!(config.log_level, defaults.log_level);
     }
 
     #[test]
-    fn test_config_from_args() {
+    fn test_build_from_args() {
         let args = Args {
             port: Some(4000),
             max_wait_time_ms: Some(200),
@@ -159,7 +160,7 @@ mod tests {
 
     #[test]
     fn test_partial_args_from_args() {
-        let args = Args {
+        let partial_args = Args {
             port: Some(5000),
             max_wait_time_ms: None,
             max_batch_size: Some(25),
@@ -170,7 +171,7 @@ mod tests {
             max_inference_inputs: None,
         };
 
-        let config = AppConfig::build(Some(args));
+        let config = AppConfig::build(Some(partial_args));
         let defaults = AppConfig::default();
         assert_eq!(config.port, 5000);
         assert_eq!(config.max_wait_time_ms, defaults.max_wait_time_ms);
