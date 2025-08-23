@@ -26,7 +26,7 @@ pub struct Args {
     #[arg(long)]
     pub include_batch_info: Option<bool>,
 
-    /// Inference service Full URL
+    /// Inference service full URL
     #[arg(long)]
     pub inference_url: Option<String>,
 
