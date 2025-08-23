@@ -21,7 +21,8 @@ pub struct Args {
     #[arg(long)]
     pub batch_check_interval_ms: Option<u64>,
 
-    /// Whether to include batching info in response. Helpful in development. Used in tests
+    /// Whether to include batching info in response. Helpful in development. Used in tests.
+    /// Not applicable in Production setup
     #[arg(long)]
     pub include_batch_info: Option<bool>,
 
