@@ -152,6 +152,7 @@ mod tests {
         assert_eq!(config.max_wait_time_ms, 200);
         assert_eq!(config.max_batch_size, 16);
         assert_eq!(config.batch_check_interval_ms, 10);
+        assert_eq!(config.include_batch_info, false);
         assert_eq!(config.inference_url, "http://custom:9090/embed");
         assert_eq!(config.inference_timeout_secs, 60);
     }
