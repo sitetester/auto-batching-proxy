@@ -1,10 +1,9 @@
 use crate::config::AppConfig;
-use crate::inference_client::InferenceServiceClient;
+use crate::inference_client::{InferenceError, InferenceServiceClient};
 use crate::types::{
     BatchInfo, BatchRequest, BatchResponse, BatchType, EmbedResponse, ErrorResponse, PendingRequest,
 };
 use log::{debug, error, info, warn};
-use rocket::http::Status;
 use rocket::response::status::Custom;
 use rocket::serde::json::Json;
 use std::collections::VecDeque;
@@ -250,14 +249,13 @@ impl BatchProcessor {
         }
     }
 
-    fn handle_batch_error(batch: Vec<PendingRequest>, error: anyhow::Error) {
-        error!("Batch processing failed: {error}");
+    fn handle_batch_error(batch: Vec<PendingRequest>, error: InferenceError) {
+        error!("Batch processing failed: {:?}", error);
 
-        let error_message = format!("Batch processing failed: {error}");
         let error_response = Custom(
-            Self::get_status(&error_message),
+            error.to_rocket_status(),
             Json(ErrorResponse {
-                error: error_message,
+                error: error.message(),
             }),
         );
 
@@ -271,17 +269,6 @@ impl BatchProcessor {
             }
         }
     }
-
-    pub fn get_status(error_message: &str) -> Status {
-        if ["error sending request", "connection", "timeout"]
-            .iter()
-            .any(|pattern| error_message.contains(pattern))
-        {
-            Status::ServiceUnavailable
-        } else {
-            Status::InternalServerError
-        }
-    }
 }
 
 #[cfg(test)]
@@ -289,7 +276,6 @@ mod tests {
     use crate::batch_processor::BatchProcessor;
     use crate::config::AppConfig;
     use crate::types::{EmbedResponse, ErrorResponse, PendingRequest};
-    use rocket::http::Status;
     use rocket::response::status::Custom;
     use rocket::serde::json::Json;
     use std::collections::VecDeque;
@@ -330,32 +316,5 @@ mod tests {
 
         let result = BatchProcessor::build_safe_batch(&mut pending_requests, &config);
         assert_eq!(result.len(), 2);
-    }
-
-    #[test]
-    fn test_get_status() {
-        let error_message = format!("Batch processing failed: {}", "some error message");
-        assert_eq!(
-            BatchProcessor::get_status(&error_message),
-            Status::InternalServerError
-        );
-
-        let error_message = format!("Batch processing failed: {}", "error sending request");
-        assert_eq!(
-            BatchProcessor::get_status(&error_message),
-            Status::ServiceUnavailable
-        );
-
-        let error_message = format!("Batch processing failed: {}", "connection");
-        assert_eq!(
-            BatchProcessor::get_status(&error_message),
-            Status::ServiceUnavailable
-        );
-
-        let error_message = format!("Batch processing failed: {}", "timeout");
-        assert_eq!(
-            BatchProcessor::get_status(&error_message),
-            Status::ServiceUnavailable
-        );
     }
 }
