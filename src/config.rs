@@ -179,6 +179,7 @@ mod tests {
             config.batch_check_interval_ms,
             defaults.batch_check_interval_ms
         );
+        assert_eq!(config.include_batch_info, defaults.include_batch_info);
         assert_eq!(config.inference_url, defaults.inference_url);
         assert_eq!(
             config.inference_timeout_secs,
