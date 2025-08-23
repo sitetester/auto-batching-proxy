@@ -87,11 +87,9 @@ impl AppConfig {
             if let Some(batch_check_interval_ms) = args.batch_check_interval_ms {
                 config.batch_check_interval_ms = batch_check_interval_ms;
             }
-
             if let Some(include_batch_info) = args.include_batch_info {
                 config.include_batch_info = include_batch_info;
             }
-
             if let Some(inference_url) = args.inference_url {
                 config.inference_url = inference_url;
             }
