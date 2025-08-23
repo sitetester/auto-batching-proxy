@@ -1,0 +1,20 @@
+[package]
+name = "auto-batching-proxy"
+version = "0.1.0"
+edition = "2024"
+description = "High-performance auto-batching proxy for ML inference APIs"
+authors = ["Khalid H <sitetester2010@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/sitetester/auto-batching-proxy"
+
+[dependencies]
+rocket = { version = "0.5", features = ["json"] }
+tokio = { version = "1.0", features = ["rt-multi-thread", "sync", "time", "macros"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.12.22", features = ["json"] }
+clap = { version = "4.0", features = ["derive"] }
+anyhow = "1.0"
+log = "0.4"
+env_logger = "0.11.8"
+
