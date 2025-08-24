@@ -3,6 +3,7 @@ use auto_batching_proxy::{
     config::{AppConfig, Args},
 };
 use clap::Parser;
+use log::{info};
 use rocket::{launch, Build, Rocket};
 
 #[launch]
@@ -11,14 +12,24 @@ async fn rocket() -> Rocket<Build> {
     let config = AppConfig::build(Some(args));
 
     // Initialize logging and get effective log level
-    let effective_log_level = config.init_logging();
+    let _effective_log_level = config.init_logging();
 
-    log::info!("🚀 Starting auto-batching proxy server...");
+    info!("🚀 Starting auto-batching proxy server...");
+    println!("Server Configuration:");
+    println!("  Port: {}", config.port);
+    println!("  Batch Settings:");
+    println!("    Max batch size: {}", config.max_batch_size);
+    println!("    Max wait time: {}ms", config.max_wait_time_ms);
+    println!("    Check interval: {}ms", config.batch_check_interval_ms);
+    println!("  Inference:");
+    println!("    URL: {}", config.inference_url);
+    println!("    Timeout: {}s", config.inference_timeout_secs);
+    println!("    Max inputs per request: {}", config.max_inference_inputs);
+    println!("  Options:");
+    println!("    Include batch info: {}", config.include_batch_info);
+    println!("    Log level: {}", config.log_level);
+    println!();
 
-    println!(
-        "Configuration:\n\tmax_wait_time_ms: {}\n\tmax_batch_size: {}\n\tinference_url: {}\n\tlog_level: {}",
-        config.max_wait_time_ms, config.max_batch_size, config.inference_url, effective_log_level
-    );
 
     build_rocket(config).await
 }
