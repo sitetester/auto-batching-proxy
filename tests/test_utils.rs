@@ -81,7 +81,7 @@ pub async fn launch_threads_with_tests(
                     if i == 0 {
                         // let's define it here (not outside the loop, as then it could fail)
                         // here, it's safe to access such length after prior asserts
-                        first_embedding_len = embeddings[0].as_array().as_ref().len();
+                        first_embedding_len = embedding.as_array().as_ref().len();
                     }
 
                     if i > 0 {
