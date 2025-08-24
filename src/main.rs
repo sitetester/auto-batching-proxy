@@ -6,7 +6,6 @@ use clap::Parser;
 use rocket::{launch, Build, Rocket};
 
 #[launch]
-/// `-> _ ` will make Rust infer the return type automatically
 async fn rocket() -> Rocket<Build> {
     let args = Args::parse();
     let config = AppConfig::build(Some(args));
