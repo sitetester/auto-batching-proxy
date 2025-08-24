@@ -81,11 +81,11 @@ pub async fn launch_threads_with_tests(
                     if i == 0 {
                         // let's define it here (not outside the loop, as then it could fail)
                         // here, it's safe to access such length after prior asserts
-                        first_embedding_len = embedding.as_array().as_ref().len();
+                        first_embedding_len = embedding_values.len();
                     }
 
                     if i > 0 {
-                        assert_eq!(embedding_values.len(), first_embedding_len);
+                        assert_eq!(embedding_values.len(), first_embedding_len, "All embeddings should have equal length");
                     }
 
                     for value in embedding_values {
