@@ -238,7 +238,7 @@ impl BatchProcessor {
 
             let response = EmbedResponse {
                 embeddings: individual_embeddings,
-                batching_info: batch_info.clone(),
+                batch_info: batch_info.clone(),
             };
 
             // this call is handled by ```timeout(request_timeout, response_receiver).await;``` in process_request(...)

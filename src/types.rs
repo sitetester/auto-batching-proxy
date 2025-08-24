@@ -35,7 +35,7 @@ pub struct BatchInfo {
 pub struct EmbedResponse {
     pub embeddings: Vec<Vec<f32>>,
     #[serde(skip_serializing_if = "Option::is_none")] // don't show when None
-    pub batching_info: Option<BatchInfo>,
+    pub batch_info: Option<BatchInfo>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

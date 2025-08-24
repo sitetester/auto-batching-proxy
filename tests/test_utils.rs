@@ -96,17 +96,17 @@ pub async fn launch_threads_with_tests(
                     }
                 }
             }
-            // it is assumed `batching_info` is ALWAYS included while running tests (config.include_batch_info = true)
-            json["batching_info"].clone()
+            // it is assumed `batch_info` is ALWAYS included while running tests (config.include_batch_info = true)
+            json["batch_info"].clone()
         });
         handles.push(handle);
     }
 
-    let mut batching_infos = Vec::new();
+    let mut batches_info = Vec::new();
     for h in handles {
-        batching_infos.push(h.await.unwrap());
+        batches_info.push(h.await.unwrap());
     }
-    batching_infos
+    batches_info
 }
 
 pub fn build_inputs(num: usize, mut maybe_input: Option<&str>) -> Vec<String> {
@@ -138,15 +138,15 @@ pub async fn direct_call_to_inference_service(inputs: &Vec<String>) -> Vec<Vec<f
     embeddings
 }
 
-pub fn batch_type_and_size(results: &Vec<Value>, batch_type: BatchType, size: usize) -> usize {
-    results
+pub fn batch_type_and_size(batches_info: &Vec<Value>, batch_type: BatchType, size: usize) -> usize {
+    batches_info
         .iter()
-        .filter(|info| {
+        .filter(|batch_info| {
             // deserialize the JSON value to BatchType
             let json_batch_type: Result<BatchType, _> =
-                serde_json::from_value(info["batch_type"].clone());
+                serde_json::from_value(batch_info["batch_type"].clone());
             // `false` will make the `filter` fail
-            json_batch_type.map_or(false, |bt| bt == batch_type) && info["batch_size"] == size
+            json_batch_type.map_or(false, |bt| bt == batch_type) && batch_info["batch_size"] == size
         })
         .count()
 }
