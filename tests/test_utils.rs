@@ -134,11 +134,7 @@ pub async fn direct_call_to_inference_service(inputs: &Vec<String>) -> Vec<Vec<f
         .await
         .expect("Direct inference call should succeed");
 
-    let embeddings: Vec<Vec<f32>> = response
-        .json()
-        .await
-        .expect("Should parse direct response");
-
+    let embeddings: Vec<Vec<f32>> = response.json().await.expect("Should parse direct response");
     embeddings
 }
 
