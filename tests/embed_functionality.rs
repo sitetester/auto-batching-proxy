@@ -86,7 +86,10 @@ async fn test_embed_endpoint_max_batch_size_should_process_first_with_multiple_i
         launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(3, None)), true).await;
     assert_eq!(batching_infos.len(), 7);
 
-    assert_eq!(batch_type_and_size(&batching_infos, BatchType::MaxBatchSize, 5), 5); // first batch
+    assert_eq!(
+        batch_type_and_size(&batching_infos, BatchType::MaxBatchSize, 5),
+        5
+    ); // first batch
     assert_eq!(
         batch_type_and_size(&batching_infos, BatchType::MaxWaitTimeMs, 2),
         2
@@ -106,8 +109,14 @@ async fn test_embed_endpoint_max_batch_size_while_exceeding_max_inference_inputs
     assert_eq!(batching_infos.len(), 7);
 
     // max_batch_size = 4 covered with splits to config.max_inference_inputs
-    assert_eq!(batch_type_and_size(&batching_infos, BatchType::MaxBatchSize, 3), 3); // first batch
-    assert_eq!(batch_type_and_size(&batching_infos, BatchType::MaxBatchSize, 1), 1); // second batch
+    assert_eq!(
+        batch_type_and_size(&batching_infos, BatchType::MaxBatchSize, 3),
+        3
+    ); // first batch
+    assert_eq!(
+        batch_type_and_size(&batching_infos, BatchType::MaxBatchSize, 1),
+        1
+    ); // second batch
 
     assert_eq!(
         batch_type_and_size(&batching_infos, BatchType::MaxWaitTimeMs, 3),
@@ -126,7 +135,8 @@ async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_
     config.max_wait_time_ms = 500;
 
     let client = Arc::new(get_client(config).await);
-    let batching_infos = launch_threads_with_tests(client, 3, Arc::new(build_inputs(1, None)), true).await;
+    let batching_infos =
+        launch_threads_with_tests(client, 3, Arc::new(build_inputs(1, None)), true).await;
     assert_eq!(batching_infos.len(), 3);
 
     assert_eq!(
@@ -144,7 +154,8 @@ async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_
     config.max_wait_time_ms = 500;
 
     let client = Arc::new(get_client(config).await);
-    let batching_infos = launch_threads_with_tests(client, 3, Arc::new(build_inputs(5, None)), true).await;
+    let batching_infos =
+        launch_threads_with_tests(client, 3, Arc::new(build_inputs(5, None)), true).await;
     assert_eq!(batching_infos.len(), 3);
 
     assert_eq!(

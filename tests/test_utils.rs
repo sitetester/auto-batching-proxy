@@ -84,7 +84,11 @@ pub async fn launch_threads_with_tests(
                     }
 
                     if i > 0 {
-                        assert_eq!(embedding_values.len(), first_embedding_len, "All embeddings should have equal length");
+                        assert_eq!(
+                            embedding_values.len(),
+                            first_embedding_len,
+                            "All embeddings should have equal length"
+                        );
                     }
 
                     for value in embedding_values {
@@ -118,9 +122,10 @@ pub fn build_inputs(num: usize, mut maybe_input: Option<&str>) -> Vec<String> {
 }
 
 pub async fn direct_call_to_inference_service(inputs: &Vec<String>) -> Vec<Vec<f32>> {
+    // compare this with `post_json` which uses Rocket test client
     let inference_client = reqwest::Client::new();
     let direct_response = inference_client
-        .post(&AppConfig::default().inference_url)
+        .post(&AppConfig::default().inference_url) // bypasses our proxy
         .header("Content-Type", "application/json")
         .json(&json!({
             "inputs": inputs
