@@ -1,6 +1,5 @@
 use crate::request_handler::RequestHandler;
 use crate::types::{EmbedRequest, EmbedResponse, ErrorResponse};
-use log::warn;
 use rocket::http::Status;
 use rocket::response::status::Custom;
 use rocket::serde::json::Json;
@@ -26,11 +25,6 @@ pub async fn embed(
     }
 
     if request.inputs.len() > request_handler.config.max_inference_inputs {
-        warn!(
-            "Rejecting request: {} inputs exceeds limit of {}",
-            request.inputs.len(),
-            request_handler.config.max_inference_inputs
-        );
         return Err(Custom(
             Status::BadRequest,
             Json(ErrorResponse {
