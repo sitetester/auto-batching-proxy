@@ -33,6 +33,7 @@ impl RequestHandler {
         })
     }
 
+    /// This is further received by `/embed` route
     pub async fn process_request(
         &self,
         request: EmbedRequest,

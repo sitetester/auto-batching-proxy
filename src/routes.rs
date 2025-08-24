@@ -37,7 +37,7 @@ pub async fn embed(
     }
 
     match request_handler.process_request(request.into_inner()).await {
-        Ok(response) => Ok(Json(response)),
+        Ok(response) => Ok(Json(response)), // auto serialized by Rocket
         Err(error) => Err(error),
     }
 }
