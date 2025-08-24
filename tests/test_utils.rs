@@ -1,4 +1,4 @@
-use auto_batching_proxy::types::BatchType;
+use auto_batching_proxy::types::{BatchInfo, BatchType};
 use auto_batching_proxy::{build_rocket, config::AppConfig};
 use rocket::http::ContentType;
 use rocket::local::asynchronous::{Client, LocalResponse};
@@ -143,10 +143,16 @@ pub fn batch_type_and_size(batches_info: &Vec<Value>, batch_type: BatchType, siz
         .iter()
         .filter(|batch_info| {
             // deserialize the JSON value to BatchType
-            let json_batch_type: Result<BatchType, _> =
-                serde_json::from_value(batch_info["batch_type"].clone());
-            // `false` will make the `filter` fail
-            json_batch_type.map_or(false, |bt| bt == batch_type) && batch_info["batch_size"] == size
+            let batch_info_result: Result<BatchInfo, _> =
+                serde_json::from_value((*batch_info).clone());
+
+            match batch_info_result {
+                // convert to bool, `false` will make the `filter` fail
+                Ok(batch_info) => {
+                    batch_info.batch_type == batch_type && batch_info.batch_size == Some(size)
+                }
+                Err(_) => false,
+            }
         })
         .count()
 }
