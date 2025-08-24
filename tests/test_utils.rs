@@ -34,7 +34,7 @@ pub async fn post_json<'a>(
         .await
 }
 
-/// CAUTION! - inference service supports max 32 inputs
+/// CAUTION! - inference service could have max inputs limit like 32
 pub async fn launch_threads_with_tests(
     client: Arc<Client>,
     num: usize,
