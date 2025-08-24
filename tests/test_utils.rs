@@ -63,10 +63,12 @@ pub async fn launch_threads_with_tests(
                 let embeddings = json["embeddings"].as_array().unwrap();
                 assert_eq!(embeddings.len(), inputs.len(),);
 
-                assert!(
-                    embeddings[0].is_array(),
-                    "Each embedding should be an array of numbers"
-                );
+                for (i, embedding) in embeddings.iter().enumerate() {
+                    assert!(
+                        embedding.is_array(),
+                        "Embedding {} should be an array of numbers", i
+                    );
+                }
 
                 let embedding_values = embeddings[0].as_array().unwrap();
                 assert!(
