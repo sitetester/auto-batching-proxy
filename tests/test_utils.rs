@@ -20,7 +20,7 @@ pub async fn get_client_with_defaults() -> Client {
         .expect("valid rocket instance")
 }
 
-/// Helper function to make POST requests with JSON body using provided client
+/// Helper function to make POST requests with JSON body using Rocket's internal test client
 pub async fn post_json<'a>(
     client: &'a Client,
     route: &'a str,
