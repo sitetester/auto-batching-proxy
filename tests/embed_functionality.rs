@@ -63,8 +63,14 @@ async fn test_embed_endpoint_max_batch_size_should_process_first_with_single_inp
         launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(1, None)), false).await;
     assert_eq!(results.len(), 7);
 
-    assert_eq!(batch_type_and_size(&results, BatchType::MaxBatchSize, 5,), 5); // first batch
-    assert_eq!(batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 2), 2); // second batch
+    assert_eq!(
+        batch_type_and_size(&results, BatchType::MaxBatchSize, 5,),
+        5
+    ); // first batch
+    assert_eq!(
+        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 2),
+        2
+    ); // second batch
 }
 
 #[tokio::test]
@@ -81,7 +87,10 @@ async fn test_embed_endpoint_max_batch_size_should_process_first_with_multiple_i
     assert_eq!(results.len(), 7);
 
     assert_eq!(batch_type_and_size(&results, BatchType::MaxBatchSize, 5), 5); // first batch
-    assert_eq!(batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 2), 2); // second batch
+    assert_eq!(
+        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 2),
+        2
+    ); // second batch
 }
 
 #[tokio::test]
@@ -100,7 +109,10 @@ async fn test_embed_endpoint_max_batch_size_while_exceeding_max_inference_inputs
     assert_eq!(batch_type_and_size(&results, BatchType::MaxBatchSize, 3), 3); // first batch
     assert_eq!(batch_type_and_size(&results, BatchType::MaxBatchSize, 1), 1); // second batch
 
-    assert_eq!(batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3), 3); // third batch
+    assert_eq!(
+        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3),
+        3
+    ); // third batch
 }
 // max_batch_size - end
 
@@ -118,7 +130,10 @@ async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_
         launch_threads_with_tests(client, 3, Arc::new(build_inputs(1, None)), false).await;
     assert_eq!(results.len(), 3);
 
-    assert_eq!(batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3), 3);
+    assert_eq!(
+        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3),
+        3
+    );
 }
 
 #[tokio::test]
@@ -134,7 +149,10 @@ async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_
         launch_threads_with_tests(client, 3, Arc::new(build_inputs(5, None)), false).await;
     assert_eq!(results.len(), 3);
 
-    assert_eq!(batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3), 3);
+    assert_eq!(
+        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3),
+        3
+    );
 }
 
 #[tokio::test]
@@ -149,8 +167,14 @@ async fn test_embed_endpoint_max_wait_time_ms_while_exceeding_max_inference_inpu
         launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(10, None)), false).await;
     assert_eq!(results.len(), 7);
 
-    assert_eq!(batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3), 6); // first & second batch
-    assert_eq!(batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 1), 1); // third batch
+    assert_eq!(
+        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3),
+        6
+    ); // first & second batch
+    assert_eq!(
+        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 1),
+        1
+    ); // third batch
 }
 // max_wait_time_ms - end
 

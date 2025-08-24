@@ -7,8 +7,8 @@ use log::{debug, error, info, warn};
 use rocket::response::status::Custom;
 use rocket::serde::json::Json;
 use std::collections::VecDeque;
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 use tokio::sync::mpsc;
 
@@ -292,7 +292,7 @@ mod tests {
 
         let mut pending_requests = VecDeque::new();
         for _ in 1..=10 {
-            let (response_sender, _): ( ResponseSender, _) = oneshot::channel();
+            let (response_sender, _): (ResponseSender, _) = oneshot::channel();
             let pending_request = PendingRequest::new(vec!["Hello".to_string()], response_sender);
             pending_requests.push_back(pending_request);
         }
@@ -310,7 +310,7 @@ mod tests {
 
         let mut pending_requests = VecDeque::new();
         for _ in 1..=3 {
-            let (response_sender, _): ( ResponseSender, _) = oneshot::channel();
+            let (response_sender, _): (ResponseSender, _) = oneshot::channel();
             let pending_request = PendingRequest::new(inputs.clone(), response_sender);
             pending_requests.push_back(pending_request);
         }

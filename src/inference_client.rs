@@ -3,8 +3,8 @@ use crate::types::{BatchRequest, BatchResponse};
 use anyhow::{Result, anyhow};
 use log::debug;
 use reqwest::Error;
-use std::time::Duration;
 use rocket::http::Status;
+use std::time::Duration;
 
 #[derive(Debug)]
 pub enum InferenceError {

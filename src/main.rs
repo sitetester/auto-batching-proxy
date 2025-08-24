@@ -3,8 +3,8 @@ use auto_batching_proxy::{
     config::{AppConfig, Args},
 };
 use clap::Parser;
-use log::{info};
-use rocket::{launch, Build, Rocket};
+use log::info;
+use rocket::{Build, Rocket, launch};
 
 #[launch]
 async fn rocket() -> Rocket<Build> {
@@ -25,12 +25,14 @@ async fn rocket() -> Rocket<Build> {
     println!("  Inference:");
     println!("    URL: {}", config.inference_url);
     println!("    Timeout: {}s", config.inference_timeout_secs);
-    println!("    Max inputs per request: {}", config.max_inference_inputs);
+    println!(
+        "    Max inputs per request: {}",
+        config.max_inference_inputs
+    );
     println!("  Options:");
     println!("    Include batch info: {}", config.include_batch_info);
     println!("    Log level: {}", config.log_level);
     println!();
-
 
     build_rocket(config).await
 }

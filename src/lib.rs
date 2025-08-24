@@ -8,8 +8,8 @@ pub mod types;
 use crate::config::AppConfig;
 use crate::request_handler::RequestHandler;
 use crate::types::ErrorResponse;
-use rocket::{Build, Rocket, catch, Request, http::Status};
 use rocket::serde::json::Json;
+use rocket::{Build, Request, Rocket, catch, http::Status};
 use std::sync::Arc;
 
 /// Only catches errors that aren't explicitly handled,
