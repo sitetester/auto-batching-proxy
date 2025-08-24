@@ -92,6 +92,7 @@ pub async fn launch_threads_with_tests(
                     }
                 }
             }
+            // it is assumed `batching_info` is ALWAYS included while running tests (config.include_batch_info = true)
             json["batching_info"].clone()
         });
         handles.push(handle);
