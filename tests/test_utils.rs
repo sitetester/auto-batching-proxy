@@ -1,5 +1,6 @@
 use auto_batching_proxy::types::BatchType;
 use auto_batching_proxy::{build_rocket, config::AppConfig};
+use rocket::form::validate::Len;
 use rocket::http::ContentType;
 use rocket::local::asynchronous::{Client, LocalResponse};
 use serde_json::{Value, json};
@@ -63,21 +64,33 @@ pub async fn launch_threads_with_tests(
                 let embeddings = json["embeddings"].as_array().unwrap();
                 assert_eq!(embeddings.len(), inputs.len(),);
 
+                let mut first_embedding_len = 0;
                 for (i, embedding) in embeddings.iter().enumerate() {
                     assert!(
                         embedding.is_array(),
-                        "Embedding {} should be an array of numbers", i
+                        "Embedding {} should be an array of numbers",
+                        i
                     );
-                }
 
-                let embedding_values = embeddings[0].as_array().unwrap();
-                assert!(
-                    !embedding_values.is_empty(),
-                    "Embedding should not be empty"
-                );
+                    let embedding_values = embedding.as_array().unwrap();
+                    assert!(
+                        !embedding_values.is_empty(),
+                        "Embedding should not be empty"
+                    );
 
-                for value in embedding_values {
-                    assert!(value.is_number(), "All embedding values should be numbers");
+                    if i == 0 {
+                        // let's define it here (not outside the loop, as then it could fail)
+                        // here, it's safe to access such length after prior asserts
+                        first_embedding_len = embeddings[0].as_array().as_ref().len();
+                    }
+
+                    if i > 0 {
+                        assert_eq!(embedding_values.len(), first_embedding_len);
+                    }
+
+                    for value in embedding_values {
+                        assert!(value.is_number(), "All embedding values should be numbers");
+                    }
                 }
             }
             json["batching_info"].clone()

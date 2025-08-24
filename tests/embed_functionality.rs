@@ -126,8 +126,7 @@ async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_
     config.max_wait_time_ms = 500;
 
     let client = Arc::new(get_client(config).await);
-    let results =
-        launch_threads_with_tests(client, 3, Arc::new(build_inputs(1, None)), true).await;
+    let results = launch_threads_with_tests(client, 3, Arc::new(build_inputs(1, None)), true).await;
     assert_eq!(results.len(), 3);
 
     assert_eq!(
@@ -145,8 +144,7 @@ async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_
     config.max_wait_time_ms = 500;
 
     let client = Arc::new(get_client(config).await);
-    let results =
-        launch_threads_with_tests(client, 3, Arc::new(build_inputs(5, None)), true).await;
+    let results = launch_threads_with_tests(client, 3, Arc::new(build_inputs(5, None)), true).await;
     assert_eq!(results.len(), 3);
 
     assert_eq!(
