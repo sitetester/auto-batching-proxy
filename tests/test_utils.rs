@@ -47,7 +47,7 @@ pub async fn launch_threads_with_tests(
         let inputs = inputs.clone();
         let handle = tokio::spawn(async move {
             let response = post_json(
-                &*client, // dereference Arc to get &Client
+                client.as_ref(), // alternatively (&*client, as * causes Deref)
                 "/embed",
                 json!({"inputs": *inputs}).to_string(),
             )
