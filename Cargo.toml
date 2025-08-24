@@ -2,7 +2,7 @@
 name = "auto-batching-proxy"
 version = "0.1.0"
 edition = "2024"
-description = "High-performance auto-batching proxy for ML inference APIs"
+description = "High-performance auto-batching proxy for inference APIs / toolkits like https://github.com/huggingface/text-embeddings-inference"
 authors = ["Khalid H <sitetester2010@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/sitetester/auto-batching-proxy"
