@@ -1,6 +1,7 @@
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
+use rocket::log::LogLevel;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -37,6 +38,10 @@ pub struct Args {
     /// Maximum inputs per inference service call
     #[arg(long)]
     pub max_inference_inputs: Option<usize>,
+
+    /// Maximum inputs per inference service call
+    #[arg(long)]
+    pub log_level: Option<LogLevel>
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -99,6 +104,9 @@ impl AppConfig {
             if let Some(max_inference_inputs) = args.max_inference_inputs {
                 config.max_inference_inputs = max_inference_inputs;
             }
+            if let Some(log_level) = args.log_level {
+                config.log_level = log_level.to_string().to_lowercase();
+            }
         }
         config
     }
@@ -145,6 +153,7 @@ mod tests {
             inference_url: Some("http://custom:9090/embed".to_string()),
             inference_timeout_secs: Some(60),
             max_inference_inputs: None,
+            log_level: None,
         };
 
         let config = AppConfig::build(Some(args));
@@ -168,6 +177,7 @@ mod tests {
             inference_url: None,
             inference_timeout_secs: None,
             max_inference_inputs: None,
+            log_level: None,
         };
 
         let config = AppConfig::build(Some(partial_args));
