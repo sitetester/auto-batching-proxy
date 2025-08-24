@@ -158,18 +158,7 @@ pub fn batch_type_and_size(batches_info: &Vec<Value>, batch_type: BatchType, siz
 }
 
 pub fn get_proxy_embeddings(json: Value) -> Vec<Vec<f32>> {
-    json["embeddings"]
-        .as_array() // Get the embeddings array
-        .expect("embeddings should be an array")
-        .iter()
-        .map(|embedding| {
-            // For each embedding
-            embedding
-                .as_array() // Convert to array of numbers
-                .expect("each embedding should be an array")
-                .iter()
-                .map(|val| val.as_f64().expect("embedding values should be numbers") as f32)
-                .collect::<Vec<f32>>()
-        })
-        .collect::<Vec<Vec<f32>>>()
+    let proxy_embeddings: Vec<Vec<f32>> =
+        serde_json::from_value(json["embeddings"].clone()).expect("Should parse embeddings");
+    proxy_embeddings
 }
