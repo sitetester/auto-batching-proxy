@@ -1,6 +1,5 @@
 use auto_batching_proxy::types::BatchType;
 use auto_batching_proxy::{build_rocket, config::AppConfig};
-use rocket::form::validate::Len;
 use rocket::http::ContentType;
 use rocket::local::asynchronous::{Client, LocalResponse};
 use serde_json::{Value, json};
