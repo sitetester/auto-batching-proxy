@@ -15,6 +15,7 @@ async fn rocket() -> Rocket<Build> {
     let _effective_log_level = config.init_logging();
 
     info!("🚀 Starting auto-batching proxy server...");
+    
     println!("Server Configuration:");
     println!("  Port: {}", config.port);
     println!("  Batch Settings:");
