@@ -39,7 +39,7 @@ pub async fn launch_threads_with_tests(
     client: Arc<Client>,
     num: usize,
     inputs: Arc<Vec<String>>,
-    skip_tests: bool,
+    run_assertions: bool,
 ) -> Vec<Value> {
     let mut handles = Vec::new();
     for _ in 1..=num {
@@ -54,7 +54,7 @@ pub async fn launch_threads_with_tests(
             .await;
 
             let json: Value = response.into_json().await.expect("Valid JSON");
-            if skip_tests {
+            if run_assertions {
                 assert!(
                     json["embeddings"].is_array(),
                     "Response should contain embeddings array"

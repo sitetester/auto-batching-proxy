@@ -60,7 +60,7 @@ async fn test_embed_endpoint_max_batch_size_should_process_first_with_single_inp
 
     let client = Arc::new(get_client(config).await);
     let results =
-        launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(1, None)), false).await;
+        launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(1, None)), true).await;
     assert_eq!(results.len(), 7);
 
     assert_eq!(
@@ -83,7 +83,7 @@ async fn test_embed_endpoint_max_batch_size_should_process_first_with_multiple_i
 
     let client = Arc::new(get_client(config).await);
     let results =
-        launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(3, None)), false).await;
+        launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(3, None)), true).await;
     assert_eq!(results.len(), 7);
 
     assert_eq!(batch_type_and_size(&results, BatchType::MaxBatchSize, 5), 5); // first batch
@@ -102,7 +102,7 @@ async fn test_embed_endpoint_max_batch_size_while_exceeding_max_inference_inputs
 
     let client = Arc::new(get_client(config).await);
     let results =
-        launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(10, None)), false).await;
+        launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(10, None)), true).await;
     assert_eq!(results.len(), 7);
 
     // max_batch_size = 4 covered with splits to config.max_inference_inputs
@@ -127,7 +127,7 @@ async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_
 
     let client = Arc::new(get_client(config).await);
     let results =
-        launch_threads_with_tests(client, 3, Arc::new(build_inputs(1, None)), false).await;
+        launch_threads_with_tests(client, 3, Arc::new(build_inputs(1, None)), true).await;
     assert_eq!(results.len(), 3);
 
     assert_eq!(
@@ -146,7 +146,7 @@ async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_
 
     let client = Arc::new(get_client(config).await);
     let results =
-        launch_threads_with_tests(client, 3, Arc::new(build_inputs(5, None)), false).await;
+        launch_threads_with_tests(client, 3, Arc::new(build_inputs(5, None)), true).await;
     assert_eq!(results.len(), 3);
 
     assert_eq!(
@@ -164,7 +164,7 @@ async fn test_embed_endpoint_max_wait_time_ms_while_exceeding_max_inference_inpu
 
     let client = Arc::new(get_client(config).await);
     let results =
-        launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(10, None)), false).await;
+        launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(10, None)), true).await;
     assert_eq!(results.len(), 7);
 
     assert_eq!(
@@ -208,7 +208,7 @@ async fn test_compare_single_input_inference_service_vs_auto_batching_proxy_with
             client.clone(),
             num_requests,
             Arc::new(build_inputs(1, None)),
-            true,
+            false,
         )
         .await;
         proxy_timings.insert(num_requests, start_time.elapsed());
