@@ -4,6 +4,7 @@ use anyhow::{Result, anyhow};
 use log::debug;
 use reqwest::Error;
 use std::time::Duration;
+use rocket::http::Status;
 
 #[derive(Debug)]
 pub enum InferenceError {
@@ -15,15 +16,15 @@ pub enum InferenceError {
     ParseError(Error),
 }
 impl InferenceError {
-    pub fn to_rocket_status(&self) -> rocket::http::Status {
+    pub fn to_rocket_status(&self) -> Status {
         match self {
-            InferenceError::NetworkError(_) => rocket::http::Status::ServiceUnavailable,
+            InferenceError::NetworkError(_) => Status::ServiceUnavailable,
             InferenceError::HttpError { status, .. } => match status.as_u16() {
-                400..=499 => rocket::http::Status::BadRequest,
-                500..=599 => rocket::http::Status::ServiceUnavailable,
-                _ => rocket::http::Status::InternalServerError,
+                400..=499 => Status::BadRequest,
+                500..=599 => Status::ServiceUnavailable,
+                _ => Status::InternalServerError,
             },
-            InferenceError::ParseError(_) => rocket::http::Status::InternalServerError,
+            InferenceError::ParseError(_) => Status::InternalServerError,
         }
     }
 
