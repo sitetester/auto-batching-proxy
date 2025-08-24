@@ -112,13 +112,13 @@ mod tests {
     #[test]
     fn test_prepare_request_can_handle_multiple_inputs_per_user() {
         let (response_sender, _response_receiver) = oneshot::channel();
-        let req1 = PendingRequest {
+        let req = PendingRequest {
             inputs: vec!["Hello".to_string(), "World".to_string()],
             response_sender,
             received_at: Instant::now(),
         };
 
-        let batch: Vec<PendingRequest> = vec![req1];
+        let batch: Vec<PendingRequest> = vec![req];
         let prepared = BatchRequest::prepare_request(&batch);
 
         assert_eq!(prepared.inputs.len(), 2);
