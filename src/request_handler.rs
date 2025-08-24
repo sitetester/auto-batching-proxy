@@ -59,23 +59,34 @@ impl RequestHandler {
         // this is different from `--max-wait-time-ms x` which is for our proxy batch execution delay time
         let request_timeout = self.config.max_wait_time_duration() + Duration::from_secs(30);
 
-        timeout(request_timeout, response_receiver)
-            .await
-            .map_err(|_| {
-                Custom(
-                    Status::RequestTimeout,
-                    Json(ErrorResponse {
-                        error: "Request timed out".to_string(),
-                    }),
-                )
-            })?
-            .map_err(|_| {
-                Custom(
-                    Status::InternalServerError,
-                    Json(ErrorResponse {
-                        error: "Response channel closed".to_string(),
-                    }),
-                )
-            })?
+        // without `timeout`, requests could hang indefinitely, just in case:
+        // batch processor gets stuck or downstream inference service becomes unresponsive
+        // check ```response_sender.send(Ok(response))``` in batch_processor
+        let timeout_result = timeout(request_timeout, response_receiver).await;
+
+        // Result<Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>, Elapsed>
+        let after_timeout_check = timeout_result.map_err(|_| {
+            Custom(
+                Status::RequestTimeout,
+                Json(ErrorResponse {
+                    error: "Request timed out".to_string(),
+                }),
+            )
+        })?;
+        // Result<Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>, Custom<Json<ErrorResponse>>>
+        // Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>
+        // (? unwrapped outer layer, early return if timeout)
+        after_timeout_check.map_err(|_| {
+            Custom(
+                Status::InternalServerError,
+                Json(ErrorResponse {
+                    error: "Response channel closed".to_string(),
+                }),
+            )
+        })?
+        // Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, Custom<Json<ErrorResponse>>>
+        // Result<EmbedResponse, Custom<Json<ErrorResponse>>>
+        // (? unwrapped outer layer, early return if timeout)
+        // which is the return type of `process_request(...)`
     }
 }
