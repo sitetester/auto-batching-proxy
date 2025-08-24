@@ -35,7 +35,7 @@ but our proxy will respect this config param & will not send requests (as well a
 
 
 **[Unit tests](https://doc.rust-lang.org/book/ch11-03-test-organization.html#unit-tests)**   
-Relevant unit tests are provided inside source code files inside `/src`
+Relevant unit tests are provided inside `/src` source code files
 
 **[Integration tests](https://doc.rust-lang.org/book/ch11-03-test-organization.html#integration-tests)**  
 Check the `/tests` folder, code is covered with various scenarios.
@@ -45,7 +45,6 @@ Run all tests via `cargo test`. Currently, tests are verified to be passed again
 & they also explain how/why which part of code was written for which particular use case.
 
 Use the following simple CURL commands for quick testing
-**via CURL**
 - for inference
 ```
 curl -X POST http://localhost:8080/embed \
@@ -64,7 +63,7 @@ cd scripts
 ./proxy_concurrent_calls.sh
 ```
 
-**Benchmark test results:**
+**Benchmark test results:**  
 Following output is taken from 
 ```
 cargo test test_compare_single_input_inference_service_vs_auto_batching_proxy_with_30_separate_requests -- --nocapture
