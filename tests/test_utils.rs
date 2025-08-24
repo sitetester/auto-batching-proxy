@@ -124,7 +124,7 @@ pub fn build_inputs(num: usize, mut maybe_input: Option<&str>) -> Vec<String> {
 pub async fn direct_call_to_inference_service(inputs: &Vec<String>) -> Vec<Vec<f32>> {
     // compare this with `post_json` which uses Rocket test client
     let inference_client = reqwest::Client::new();
-    let direct_response = inference_client
+    let response = inference_client
         .post(&AppConfig::default().inference_url) // bypasses our proxy
         .header("Content-Type", "application/json")
         .json(&json!({
@@ -134,12 +134,12 @@ pub async fn direct_call_to_inference_service(inputs: &Vec<String>) -> Vec<Vec<f
         .await
         .expect("Direct inference call should succeed");
 
-    let direct_embeddings: Vec<Vec<f32>> = direct_response
+    let embeddings: Vec<Vec<f32>> = response
         .json()
         .await
         .expect("Should parse direct response");
 
-    direct_embeddings
+    embeddings
 }
 
 pub fn batch_type_and_size(results: &Vec<Value>, batch_type: BatchType, size: usize) -> usize {
