@@ -16,9 +16,6 @@ pub async fn embed(
     request: Json<EmbedRequest>,
     request_handler: &State<Arc<RequestHandler>>,
 ) -> Result<Json<EmbedResponse>, Custom<Json<ErrorResponse>>> {
-    // Validate inputs are not empty - fail fast before batching
-    // This is cheaper to check here than in the batch processor
-    // and provides immediate feedback to the user for invalid requests
     if request.inputs.is_empty() {
         return Err(Custom(
             Status::BadRequest,
