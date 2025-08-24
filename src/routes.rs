@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 /// POST /embed - Main embedding endpoint
 ///
-/// Accepts a JSON request with text inputs and returns embeddings.
+/// Accepts a JSON request with string inputs and returns embeddings.
 /// Requests are automatically batched for efficiency.
 #[post("/embed", data = "<request>")]
 pub async fn embed(
