@@ -61,7 +61,7 @@ async fn test_embed_endpoint_fails_when_inputs_exceeds_config_max_inference_inpu
 
     assert_eq!(response.status(), Status::BadRequest);
 
-    let body: serde_json::Value = response.into_json().await.expect("Valid JSON");
+    let body: Value = response.into_json().await.expect("Valid JSON");
     assert!(body.is_object());
     assert!(body["error"].is_string());
     assert_eq!(body["error"], "`inputs` can't be greater than 20");
@@ -93,7 +93,7 @@ async fn test_embed_endpoint_invalid_json_plain_text() {
     let response = post_json(&client, "/embed", "dummy plain text".to_string()).await;
     assert_eq!(response.status(), Status::BadRequest);
 
-    let body: serde_json::Value = response.into_json().await.expect("Valid JSON");
+    let body: Value = response.into_json().await.expect("Valid JSON");
 
     println!("{:?}", body);
 }
@@ -105,7 +105,7 @@ async fn test_embed_endpoint_invalid_json_missing_quotes() {
     let response = post_json(&client, "/embed", invalid_json.to_string()).await;
     assert_eq!(response.status(), Status::BadRequest);
 
-    let body: serde_json::Value = response.into_json().await.expect("Valid JSON response");
+    let body: Value = response.into_json().await.expect("Valid JSON response");
     println!("Invalid JSON error: {:?}", body);
 }
 
