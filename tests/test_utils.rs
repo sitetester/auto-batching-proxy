@@ -98,11 +98,11 @@ pub async fn launch_threads_with_tests(
         handles.push(handle);
     }
 
-    let mut results = Vec::new();
+    let mut batching_infos = Vec::new();
     for h in handles {
-        results.push(h.await.unwrap());
+        batching_infos.push(h.await.unwrap());
     }
-    results
+    batching_infos
 }
 
 pub fn build_inputs(num: usize, mut maybe_input: Option<&str>) -> Vec<String> {

@@ -59,16 +59,16 @@ async fn test_embed_endpoint_max_batch_size_should_process_first_with_single_inp
     config.max_wait_time_ms = 1000;
 
     let client = Arc::new(get_client(config).await);
-    let results =
+    let batching_infos =
         launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(1, None)), true).await;
-    assert_eq!(results.len(), 7);
+    assert_eq!(batching_infos.len(), 7);
 
     assert_eq!(
-        batch_type_and_size(&results, BatchType::MaxBatchSize, 5,),
+        batch_type_and_size(&batching_infos, BatchType::MaxBatchSize, 5,),
         5
     ); // first batch
     assert_eq!(
-        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 2),
+        batch_type_and_size(&batching_infos, BatchType::MaxWaitTimeMs, 2),
         2
     ); // second batch
 }
@@ -82,13 +82,13 @@ async fn test_embed_endpoint_max_batch_size_should_process_first_with_multiple_i
     config.max_wait_time_ms = 1000;
 
     let client = Arc::new(get_client(config).await);
-    let results =
+    let batching_infos =
         launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(3, None)), true).await;
-    assert_eq!(results.len(), 7);
+    assert_eq!(batching_infos.len(), 7);
 
-    assert_eq!(batch_type_and_size(&results, BatchType::MaxBatchSize, 5), 5); // first batch
+    assert_eq!(batch_type_and_size(&batching_infos, BatchType::MaxBatchSize, 5), 5); // first batch
     assert_eq!(
-        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 2),
+        batch_type_and_size(&batching_infos, BatchType::MaxWaitTimeMs, 2),
         2
     ); // second batch
 }
@@ -101,16 +101,16 @@ async fn test_embed_endpoint_max_batch_size_while_exceeding_max_inference_inputs
     config.max_wait_time_ms = 1000;
 
     let client = Arc::new(get_client(config).await);
-    let results =
+    let batching_infos =
         launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(10, None)), true).await;
-    assert_eq!(results.len(), 7);
+    assert_eq!(batching_infos.len(), 7);
 
     // max_batch_size = 4 covered with splits to config.max_inference_inputs
-    assert_eq!(batch_type_and_size(&results, BatchType::MaxBatchSize, 3), 3); // first batch
-    assert_eq!(batch_type_and_size(&results, BatchType::MaxBatchSize, 1), 1); // second batch
+    assert_eq!(batch_type_and_size(&batching_infos, BatchType::MaxBatchSize, 3), 3); // first batch
+    assert_eq!(batch_type_and_size(&batching_infos, BatchType::MaxBatchSize, 1), 1); // second batch
 
     assert_eq!(
-        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3),
+        batch_type_and_size(&batching_infos, BatchType::MaxWaitTimeMs, 3),
         3
     ); // third batch
 }
@@ -126,11 +126,11 @@ async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_
     config.max_wait_time_ms = 500;
 
     let client = Arc::new(get_client(config).await);
-    let results = launch_threads_with_tests(client, 3, Arc::new(build_inputs(1, None)), true).await;
-    assert_eq!(results.len(), 3);
+    let batching_infos = launch_threads_with_tests(client, 3, Arc::new(build_inputs(1, None)), true).await;
+    assert_eq!(batching_infos.len(), 3);
 
     assert_eq!(
-        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3),
+        batch_type_and_size(&batching_infos, BatchType::MaxWaitTimeMs, 3),
         3
     );
 }
@@ -144,11 +144,11 @@ async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_
     config.max_wait_time_ms = 500;
 
     let client = Arc::new(get_client(config).await);
-    let results = launch_threads_with_tests(client, 3, Arc::new(build_inputs(5, None)), true).await;
-    assert_eq!(results.len(), 3);
+    let batching_infos = launch_threads_with_tests(client, 3, Arc::new(build_inputs(5, None)), true).await;
+    assert_eq!(batching_infos.len(), 3);
 
     assert_eq!(
-        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3),
+        batch_type_and_size(&batching_infos, BatchType::MaxWaitTimeMs, 3),
         3
     );
 }
@@ -161,16 +161,16 @@ async fn test_embed_endpoint_max_wait_time_ms_while_exceeding_max_inference_inpu
     config.max_wait_time_ms = 500;
 
     let client = Arc::new(get_client(config).await);
-    let results =
+    let batching_infos =
         launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(10, None)), true).await;
-    assert_eq!(results.len(), 7);
+    assert_eq!(batching_infos.len(), 7);
 
     assert_eq!(
-        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 3),
+        batch_type_and_size(&batching_infos, BatchType::MaxWaitTimeMs, 3),
         6
     ); // first & second batch
     assert_eq!(
-        batch_type_and_size(&results, BatchType::MaxWaitTimeMs, 1),
+        batch_type_and_size(&batching_infos, BatchType::MaxWaitTimeMs, 1),
         1
     ); // third batch
 }
