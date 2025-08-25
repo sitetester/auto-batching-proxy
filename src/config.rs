@@ -96,6 +96,9 @@ impl AppConfig {
                 config.max_batch_size = max_batch_size;
             }
             if let Some(batch_check_interval_ms) = args.batch_check_interval_ms {
+                if batch_check_interval_ms == 0 {
+                    return Err("batch_check_interval_ms must be > 0".to_string());
+                }
                 config.batch_check_interval_ms = batch_check_interval_ms;
             }
             if let Some(include_batch_info) = args.include_batch_info {
@@ -105,9 +108,15 @@ impl AppConfig {
                 config.inference_url = inference_url;
             }
             if let Some(inference_timeout_secs) = args.inference_timeout_secs {
+                if inference_timeout_secs == 0 {
+                    return Err("inference_timeout_secs must be > 0".to_string());
+                }
                 config.inference_timeout_secs = inference_timeout_secs;
             }
             if let Some(max_inference_inputs) = args.max_inference_inputs {
+                if max_inference_inputs == 0 {
+                    return Err("max_inference_inputs must be > 0".to_string());
+                }
                 config.max_inference_inputs = max_inference_inputs;
             }
             if let Some(log_level) = args.log_level {
@@ -243,6 +252,39 @@ mod tests {
     fn test_build_fails_when_max_wait_time_ms_is_0() {
         let invalid_args = Args {
             max_wait_time_ms: Some(0),
+            ..get_empty_args()
+        };
+
+        let config = AppConfig::build(Some(invalid_args));
+        assert!(config.is_err());
+    }
+
+    #[test]
+    fn test_build_fails_when_batch_check_interval_ms_is_0() {
+        let invalid_args = Args {
+            batch_check_interval_ms: Some(0),
+            ..get_empty_args()
+        };
+
+        let config = AppConfig::build(Some(invalid_args));
+        assert!(config.is_err());
+    }
+
+    #[test]
+    fn test_build_fails_when_inference_timeout_secs_is_0() {
+        let invalid_args = Args {
+            inference_timeout_secs: Some(0),
+            ..get_empty_args()
+        };
+
+        let config = AppConfig::build(Some(invalid_args));
+        assert!(config.is_err());
+    }
+
+    #[test]
+    fn test_build_fails_when_max_inference_inputs_is_0() {
+        let invalid_args = Args {
+            max_inference_inputs: Some(0),
             ..get_empty_args()
         };
 

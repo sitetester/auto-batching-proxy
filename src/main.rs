@@ -9,12 +9,10 @@ use rocket::{Build, Rocket, launch};
 #[launch]
 async fn rocket() -> Rocket<Build> {
     let args = Args::parse();
-    let config = AppConfig::build(Some(args))
-        .unwrap_or_else(|err| {
-            eprintln!("Configuration error: {}", err);
-            std::process::exit(1);
-        });
-
+    let config = AppConfig::build(Some(args)).unwrap_or_else(|err| {
+        eprintln!("Configuration error: {}", err);
+        std::process::exit(1);
+    });
 
     // Initialize logging and get effective log level
     let _effective_log_level = config.init_logging();
