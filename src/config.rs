@@ -75,18 +75,24 @@ impl Default for AppConfig {
 
 impl AppConfig {
     /// Build config from CLI args and defaults
-    pub fn build(args: Option<Args>) -> Self {
+    pub fn build(args: Option<Args>) -> Result<Self, String> {
         let mut config = Self::default();
         if let Some(args) = args {
             if let Some(port) = args.port {
                 config.port = port;
             }
             if let Some(max_wait_time_ms) = args.max_wait_time_ms {
+                if max_wait_time_ms == 0 {
+                    return Err("max_wait_time_ms must be > 0".to_string());
+                }
                 config.max_wait_time_ms = max_wait_time_ms;
             }
             //  `--model-id sentence-transformers/all-MiniLM-L6-v2` handles max 32 inputs
             // max 32 check is not applied here, since different models could have different configs
             if let Some(max_batch_size) = args.max_batch_size {
+                if max_batch_size == 0 {
+                    return Err("max_batch_size must be > 0".to_string());
+                }
                 config.max_batch_size = max_batch_size;
             }
             if let Some(batch_check_interval_ms) = args.batch_check_interval_ms {
@@ -108,7 +114,7 @@ impl AppConfig {
                 config.log_level = log_level.to_string().to_lowercase();
             }
         }
-        config
+        Ok(config)
     }
 
     pub fn max_wait_time_duration(&self) -> Duration {
@@ -131,8 +137,11 @@ mod tests {
 
     #[test]
     fn test_build_from_default() {
-        let defaults = AppConfig::default();
         let config = AppConfig::build(None);
+        assert!(config.is_ok());
+        let config = config.unwrap();
+
+        let defaults = AppConfig::default();
         assert_eq!(config.port, defaults.port);
         assert_eq!(config.max_wait_time_ms, defaults.max_wait_time_ms);
         assert_eq!(config.max_batch_size, defaults.max_batch_size);
@@ -151,42 +160,58 @@ mod tests {
     #[test]
     fn test_build_from_args() {
         let args = Args {
-            port: Some(4000),
+            port: Some(6000),
             max_wait_time_ms: Some(200),
             max_batch_size: Some(16),
-            batch_check_interval_ms: Some(10),
-            include_batch_info: None,
+            batch_check_interval_ms: Some(50),
+            include_batch_info: Some(false),
             inference_url: Some("http://custom:9090/embed".to_string()),
             inference_timeout_secs: Some(60),
-            max_inference_inputs: None,
-            log_level: None,
+            max_inference_inputs: Some(16),
+            log_level: Some(LogLevel::Debug),
         };
 
         let config = AppConfig::build(Some(args));
-        assert_eq!(config.port, 4000);
+        assert!(config.is_ok());
+        let config = config.unwrap();
+
+        assert_eq!(config.port, 6000);
         assert_eq!(config.max_wait_time_ms, 200);
         assert_eq!(config.max_batch_size, 16);
-        assert_eq!(config.batch_check_interval_ms, 10);
+        assert_eq!(config.batch_check_interval_ms, 50);
         assert_eq!(config.include_batch_info, false);
         assert_eq!(config.inference_url, "http://custom:9090/embed");
         assert_eq!(config.inference_timeout_secs, 60);
+        assert_eq!(config.max_inference_inputs, 16);
+        assert_eq!(config.log_level, "debug".to_string());
     }
 
-    #[test]
-    fn test_partial_args_from_args() {
-        let partial_args = Args {
-            port: Some(5000),
+    fn get_empty_args() -> Args {
+        Args {
+            port: None,
             max_wait_time_ms: None,
-            max_batch_size: Some(25),
+            max_batch_size: None,
             batch_check_interval_ms: None,
             include_batch_info: None,
             inference_url: None,
             inference_timeout_secs: None,
             max_inference_inputs: None,
             log_level: None,
+        }
+    }
+
+    #[test]
+    fn test_build_from_partial_args() {
+        let partial_args = Args {
+            port: Some(5000),
+            max_batch_size: Some(25),
+            ..get_empty_args()
         };
 
         let config = AppConfig::build(Some(partial_args));
+        assert!(config.is_ok());
+        let config = config.unwrap();
+
         let defaults = AppConfig::default();
         assert_eq!(config.port, 5000);
         assert_eq!(config.max_wait_time_ms, defaults.max_wait_time_ms);
@@ -201,5 +226,27 @@ mod tests {
             config.inference_timeout_secs,
             defaults.inference_timeout_secs
         );
+    }
+
+    #[test]
+    fn test_build_fails_from_invalid_args_when_max_batch_size_is_0() {
+        let invalid_args = Args {
+            max_batch_size: Some(0),
+            ..get_empty_args()
+        };
+
+        let config = AppConfig::build(Some(invalid_args));
+        assert!(config.is_err());
+    }
+
+    #[test]
+    fn test_build_fails_from_invalid_args_when_max_wait_time_ms_is_0() {
+        let invalid_args = Args {
+            max_wait_time_ms: Some(0),
+            ..get_empty_args()
+        };
+
+        let config = AppConfig::build(Some(invalid_args));
+        assert!(config.is_err());
     }
 }
