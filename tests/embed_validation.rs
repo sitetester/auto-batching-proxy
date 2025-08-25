@@ -43,7 +43,7 @@ async fn test_embed_endpoint_empty_inputs() {
 }
 
 #[tokio::test]
-async fn test_embed_endpoint_fails_when_inputs_exceeds_config_max_inference_inputs() {
+async fn test_embed_endpoint_fails_when_inputs_exceed_config_max_inference_inputs() {
     let mut config = AppConfig::default();
     config.max_inference_inputs = 20;
 
