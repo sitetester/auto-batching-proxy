@@ -12,8 +12,8 @@ use serde_json::{Value, json};
 async fn test_embed_endpoint_plain_text_request() {
     let client = get_client_with_defaults().await;
     let response = client
-        .post("embed")
-        .header(ContentType::Text) // Wrong content type
+        .post("/embed")
+        .header(ContentType::Text) // wrong content type
         .body("blah")
         .dispatch()
         .await;

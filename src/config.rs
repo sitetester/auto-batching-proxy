@@ -55,6 +55,7 @@ pub struct AppConfig {
     pub inference_timeout_secs: u64,
     pub max_inference_inputs: usize,
     pub log_level: String,
+    pub quiet_mode: bool,
 }
 
 impl Default for AppConfig {
@@ -69,6 +70,7 @@ impl Default for AppConfig {
             inference_timeout_secs: 30,
             max_inference_inputs: 32,
             log_level: "info".to_string(),
+            quiet_mode: false,
         }
     }
 }

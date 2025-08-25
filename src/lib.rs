@@ -8,6 +8,7 @@ pub mod types;
 use crate::config::AppConfig;
 use crate::request_handler::RequestHandler;
 use crate::types::ErrorResponse;
+use rocket::config::LogLevel;
 use rocket::serde::json::Json;
 use rocket::{Build, Request, Rocket, catch, http::Status};
 use std::sync::Arc;
@@ -23,11 +24,17 @@ fn json_error_catcher(status: Status, _req: &Request) -> Json<ErrorResponse> {
 
 /// Builds and configures a Rocket application instance.
 /// Accessible from application as well as tests
-pub async fn build_rocket(config: AppConfig) -> Rocket<Build> {
-    let port = config.port;
+pub async fn build_rocket(app_config: AppConfig) -> Rocket<Build> {
+    let port = app_config.port;
+    let log_level = if app_config.quiet_mode {
+        LogLevel::Off // Silent Rocket (no startup messages)
+    } else {
+        LogLevel::Normal // Standard Rocket startup messages
+    };
+
     // it's OK to fail earlier in this case, since it's App startup code
     let handler = Arc::new(
-        RequestHandler::new(config)
+        RequestHandler::new(app_config)
             .await
             .expect("Failed to create RequestHandler"),
     );
@@ -41,6 +48,7 @@ pub async fn build_rocket(config: AppConfig) -> Rocket<Build> {
         .register("/", rocket::catchers![json_error_catcher])
         .configure(rocket::Config {
             port,
+            log_level,
             ..rocket::Config::default()
         })
 }

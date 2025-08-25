@@ -11,14 +11,13 @@ use std::collections::BTreeMap;
 use std::sync::Arc;
 use std::time::Duration;
 
-#[tokio::test]
-async fn test_embed_endpoint_success_single_input_using_defaults() {
+async fn success_with_num_inputs_using_defaults(num: usize) {
     let client = get_client_with_defaults().await;
     let response = post_json(
         &client,
         "/embed",
         json!({
-            "inputs": build_inputs(1, None),
+            "inputs":build_inputs(num, None),
         })
         .to_string(),
     )
@@ -28,113 +27,100 @@ async fn test_embed_endpoint_success_single_input_using_defaults() {
 
     // this "index" syntax works because of Index trait implementation
     assert!(json["embeddings"].is_array());
-    assert_eq!(json["embeddings"].as_array().unwrap().len(), 1);
+    assert_eq!(json["embeddings"].as_array().unwrap().len(), num);
+}
+
+#[tokio::test]
+async fn test_embed_endpoint_success_single_input_using_defaults() {
+    success_with_num_inputs_using_defaults(1).await
 }
 
 #[tokio::test]
 async fn test_embed_endpoint_success_multiple_inputs_using_defaults() {
-    let num: usize = 3;
-    let client = get_client_with_defaults().await;
-    let response = post_json(
-        &client,
-        "/embed",
-        json!({
-            "inputs": build_inputs(num, None),
-        })
-        .to_string(),
-    )
-    .await;
-
-    let json: Value = response.into_json().await.expect("Valid JSON response");
-    assert!(json["embeddings"].is_array());
-    assert_eq!(json["embeddings"].as_array().unwrap().len(), num);
+    success_with_num_inputs_using_defaults(3).await
 }
 
 // max_batch_size - start
-#[tokio::test]
-async fn test_embed_endpoint_max_batch_size_should_process_first_with_single_input_per_request() {
+// here we assume, inputs are within `config.max_inference_inputs = 32` range
+async fn max_batch_size_should_process_first_with_num_inputs_per_request(num: usize) {
     let mut config = AppConfig::default();
     config.include_batch_info = true;
-    config.max_batch_size = 5;
+    config.max_batch_size = 5; // smaller value
     config.max_wait_time_ms = 1000;
 
     let client = Arc::new(get_client(config).await);
     let batches_info =
-        launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(1, None)), true).await;
+        launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(num, None)), true).await;
     assert_eq!(batches_info.len(), 7);
 
     assert_eq!(count_batch(&batches_info, BatchType::MaxBatchSize, 5,), 5); // first batch
     assert_eq!(count_batch(&batches_info, BatchType::MaxWaitTimeMs, 2), 2); // second batch
 }
+#[tokio::test]
+async fn test_embed_endpoint_max_batch_size_should_process_first_with_single_input_per_request() {
+    max_batch_size_should_process_first_with_num_inputs_per_request(1).await;
+}
 
 #[tokio::test]
 async fn test_embed_endpoint_max_batch_size_should_process_first_with_multiple_inputs_per_request()
 {
-    let mut config = AppConfig::default();
-    config.include_batch_info = true;
-    config.max_batch_size = 5;
-    config.max_wait_time_ms = 1000;
-
-    let client = Arc::new(get_client(config).await);
-    let batches_info =
-        launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(3, None)), true).await;
-    assert_eq!(batches_info.len(), 7);
-
-    assert_eq!(count_batch(&batches_info, BatchType::MaxBatchSize, 5), 5); // first batch
-    assert_eq!(count_batch(&batches_info, BatchType::MaxWaitTimeMs, 2), 2); // second batch
+    max_batch_size_should_process_first_with_num_inputs_per_request(3).await;
 }
 
 #[tokio::test]
 async fn test_embed_endpoint_max_batch_size_while_exceeding_max_inference_inputs() {
     let mut config = AppConfig::default();
+    config.max_inference_inputs = 32;
     config.include_batch_info = true;
-    config.max_batch_size = 4;
+    config.max_batch_size = 4; // smaller value, max 4 requests per batch
     config.max_wait_time_ms = 1000;
 
     let client = Arc::new(get_client(config).await);
+    // launch 7 requests, each with 10 inputs, total 7 * 10 = 70 inputs
     let batches_info =
         launch_threads_with_tests(client.clone(), 7, Arc::new(build_inputs(10, None)), true).await;
     assert_eq!(batches_info.len(), 7);
 
-    // max_batch_size = 4 covered with splits to config.max_inference_inputs
-    assert_eq!(count_batch(&batches_info, BatchType::MaxBatchSize, 3), 3); // first batch
-    assert_eq!(count_batch(&batches_info, BatchType::MaxBatchSize, 1), 1); // second batch
+    // hence, these will be split into 3 batches respecting `config.max_inference_inputs`
+    // `max_batch_size = 4` will be triggered, since total launched requests are 7
 
-    assert_eq!(count_batch(&batches_info, BatchType::MaxWaitTimeMs, 3), 3); // third batch
+    // first batch will serve 3 requests (3 * 10 = 30 inputs with BatchType::MaxBatchSize)
+    // (because adding 4th request will make it 4 * 10 = 40 which is > 32
+    assert_eq!(count_batch(&batches_info, BatchType::MaxBatchSize, 3), 3);
+    // second batch will serve 1 request (1 * 10 = 10 inputs with BatchType::MaxBatchSize)
+    assert_eq!(count_batch(&batches_info, BatchType::MaxBatchSize, 1), 1);
+
+    // third batch will serve 3 remaining requests (3 * 10 = 30 inputs with BatchType::MaxWaitTimeMs)
+    assert_eq!(count_batch(&batches_info, BatchType::MaxWaitTimeMs, 3), 3);
 }
 // max_batch_size - end
 
 // max_wait_time_ms - start
-#[tokio::test]
-async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_single_input_per_request()
- {
+// here we assume, inputs are within `config.max_inference_inputs = 32` range
+async fn max_wait_time_ms_should_process_first_with_num_inputs_per_request(num: usize) {
     let mut config = AppConfig::default();
     config.include_batch_info = true;
     config.max_batch_size = 100;
-    config.max_wait_time_ms = 500;
+    config.max_wait_time_ms = 500; // smaller value
 
     let client = Arc::new(get_client(config).await);
     let batches_info =
-        launch_threads_with_tests(client, 3, Arc::new(build_inputs(1, None)), true).await;
+        launch_threads_with_tests(client, 3, Arc::new(build_inputs(num, None)), true).await;
     assert_eq!(batches_info.len(), 3);
 
     assert_eq!(count_batch(&batches_info, BatchType::MaxWaitTimeMs, 3), 3);
+}
+
+#[tokio::test]
+async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_single_input_per_request()
+ {
+    max_wait_time_ms_should_process_first_with_num_inputs_per_request(1).await;
 }
 
 #[tokio::test]
 async fn test_embed_endpoint_success_max_wait_time_ms_should_process_first_with_multiple_input_per_request()
  {
-    let mut config = AppConfig::default();
-    config.include_batch_info = true;
-    config.max_batch_size = 100;
-    config.max_wait_time_ms = 500;
-
-    let client = Arc::new(get_client(config).await);
-    let batches_info =
-        launch_threads_with_tests(client, 3, Arc::new(build_inputs(5, None)), true).await;
-    assert_eq!(batches_info.len(), 3);
-
-    assert_eq!(count_batch(&batches_info, BatchType::MaxWaitTimeMs, 3), 3);
+    max_wait_time_ms_should_process_first_with_num_inputs_per_request(5).await;
 }
 
 #[tokio::test]
@@ -142,7 +128,7 @@ async fn test_embed_endpoint_max_wait_time_ms_while_exceeding_max_inference_inpu
     let mut config = AppConfig::default();
     config.include_batch_info = true;
     config.max_batch_size = 100;
-    config.max_wait_time_ms = 500;
+    config.max_wait_time_ms = 500; // smaller value
 
     let client = Arc::new(get_client(config).await);
     let batches_info =
@@ -155,18 +141,21 @@ async fn test_embed_endpoint_max_wait_time_ms_while_exceeding_max_inference_inpu
 // max_wait_time_ms - end
 
 #[tokio::test]
-async fn test_compare_single_input_inference_service_vs_auto_batching_proxy_with_30_separate_requests()
+async fn test_compare_single_input_inference_service_vs_auto_batching_proxy_with_x_separate_requests()
  {
     let mut config = AppConfig::default();
-    config.include_batch_info = true;
+    // this will make Rocket silent :) (check lib.rs)
+    config.quiet_mode = true;
+    // let's not return any debug stuff in API responses, since our focus is on performance for now
+    config.include_batch_info = false;
     config.max_batch_size = 30;
     config.max_wait_time_ms = 50;
 
     let client = Arc::new(get_client(config).await);
+    let requests = [1, 5, 10, 25, 30, 50, 75, 100, 200, 500, 1000];
 
     // test different request counts
     let mut direct_timings: BTreeMap<usize, Duration> = BTreeMap::new();
-    let requests = [1, 5, 10, 25, 30, 50];
     for &num_requests in &requests {
         let start_time = std::time::Instant::now();
         for _ in 1..=num_requests {
@@ -177,7 +166,6 @@ async fn test_compare_single_input_inference_service_vs_auto_batching_proxy_with
 
     // proxy
     let mut proxy_timings: BTreeMap<usize, Duration> = BTreeMap::new();
-    let requests = [1_usize, 5, 10, 25, 30, 50, 75, 100];
     for &num_requests in &requests {
         let start_time = std::time::Instant::now();
         launch_threads_with_tests(

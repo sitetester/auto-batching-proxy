@@ -70,15 +70,5 @@ cargo test test_compare_single_input_inference_service_vs_auto_batching_proxy_wi
 ```
 [--nocapture](https://doc.rust-lang.org/cargo/commands/cargo-test.html#display-options) will recover display output 
 
-```
-Timing Summary:
-Requests        Direct             Proxy     
-  1          13.511366ms        65.28781ms
-  5          52.58287ms         73.557987ms
- 10         101.085006ms        75.359103ms
- 25         382.281018ms        117.845833ms
- 30         364.412884ms        71.834355ms
- 50         607.902053ms        126.407797ms
- 75              N/A            160.6118ms
- 100             N/A            205.71627ms
-```
+[Timing Summary:](screenshots/timing_summary.png)
+![timing_summary.png](screenshots/timing_summary.png)
