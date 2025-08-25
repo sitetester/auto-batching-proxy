@@ -138,7 +138,7 @@ pub async fn direct_call_to_inference_service(inputs: &Vec<String>) -> Vec<Vec<f
     embeddings
 }
 
-pub fn batch_type_and_size(batches_info: &Vec<Value>, batch_type: BatchType, size: usize) -> usize {
+pub fn count_batch(batches_info: &Vec<Value>, batch_type: BatchType, size: usize) -> usize {
     batches_info
         .iter()
         .filter(|batch_info| {
