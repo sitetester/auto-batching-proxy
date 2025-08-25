@@ -229,7 +229,7 @@ mod tests {
     }
 
     #[test]
-    fn test_build_fails_from_invalid_args_when_max_batch_size_is_0() {
+    fn test_build_fails_when_max_batch_size_is_0() {
         let invalid_args = Args {
             max_batch_size: Some(0),
             ..get_empty_args()
@@ -240,7 +240,7 @@ mod tests {
     }
 
     #[test]
-    fn test_build_fails_from_invalid_args_when_max_wait_time_ms_is_0() {
+    fn test_build_fails_when_max_wait_time_ms_is_0() {
         let invalid_args = Args {
             max_wait_time_ms: Some(0),
             ..get_empty_args()
