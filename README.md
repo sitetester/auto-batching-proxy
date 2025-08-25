@@ -70,5 +70,5 @@ cargo test test_compare_single_input_inference_service_vs_auto_batching_proxy_wi
 ```
 [--nocapture](https://doc.rust-lang.org/cargo/commands/cargo-test.html#display-options) will recover display output 
 
-[Timing Summary:](screenshots/timing_summary.png)
+[Timing Summary:](./screenshots/timing_summary_full.png)
 ![timing_summary.png](screenshots/timing_summary.png)
