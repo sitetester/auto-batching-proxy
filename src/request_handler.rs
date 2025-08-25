@@ -74,7 +74,7 @@ impl RequestHandler {
                 }),
             )
         })?;
-        // Result<Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>, Custom<Json<ErrorResponse>>>
+        // => Result<Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>, Custom<Json<ErrorResponse>>>
         // Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>
         // (? unwrapped outer layer, early return if timeout)
         after_timeout_check.map_err(|_| {
@@ -85,7 +85,7 @@ impl RequestHandler {
                 }),
             )
         })?
-        // Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, Custom<Json<ErrorResponse>>>
+        // => Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, Custom<Json<ErrorResponse>>>
         // Result<EmbedResponse, Custom<Json<ErrorResponse>>>
         // (? unwrapped outer layer, early return if timeout)
         // which is the return type of `process_request(...)`
