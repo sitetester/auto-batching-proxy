@@ -102,9 +102,8 @@ async fn test_embed_endpoint_invalid_json_missing_quotes() {
     assert_eq!(response.status(), Status::BadRequest);
 }
 
-#[tokio::test]
-async fn test_verify_direct_and_proxy_return_similar_results_for_single_input() {
-    let inputs = vec!["What is ML ?".to_string()];
+// helper / utility function (not an actual test fn)
+async fn verify_direct_and_proxy_return_similar_results(inputs: &Vec<String>) {
     let direct_embeddings = direct_call_to_inference_service(&inputs).await;
 
     let client = get_client_with_defaults().await;
@@ -129,27 +128,13 @@ async fn test_verify_direct_and_proxy_return_similar_results_for_single_input() 
 }
 
 #[tokio::test]
+async fn test_verify_direct_and_proxy_return_similar_results_for_single_input() {
+    let inputs = vec!["What is ML ?".to_string()];
+    verify_direct_and_proxy_return_similar_results(&inputs).await;
+}
+
+#[tokio::test]
 async fn test_verify_direct_and_proxy_return_similar_results_for_2_inputs() {
     let inputs = vec!["What is ML ?".to_string(), "What is NLP ?".to_string()];
-    let direct_embeddings = direct_call_to_inference_service(&inputs).await;
-
-    let client = get_client_with_defaults().await;
-    let response = post_json(
-        &client,
-        "/embed",
-        json!({
-            "inputs": inputs,
-        })
-        .to_string(),
-    )
-    .await;
-
-    let json: Value = response.into_json().await.expect("Valid JSON response");
-    let proxy_embeddings = get_proxy_embeddings(json);
-
-    // this could potentially fail due to floating point comparison
-    // test passing on ` --model-id sentence-transformers/all-MiniLM-L6-v2`
-    assert_eq!(direct_embeddings, proxy_embeddings);
-    // safe alternative
-    assert_eq!(direct_embeddings.len(), proxy_embeddings.len());
+    verify_direct_and_proxy_return_similar_results(&inputs).await;
 }
