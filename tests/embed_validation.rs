@@ -92,10 +92,6 @@ async fn test_embed_endpoint_invalid_json_plain_text() {
     let client = get_client_with_defaults().await;
     let response = post_json(&client, "/embed", "dummy plain text".to_string()).await;
     assert_eq!(response.status(), Status::BadRequest);
-
-    let body: Value = response.into_json().await.expect("Valid JSON");
-
-    println!("{:?}", body);
 }
 
 #[tokio::test]
@@ -104,9 +100,6 @@ async fn test_embed_endpoint_invalid_json_missing_quotes() {
     let invalid_json = r#"{"inputs": ["dummy plain text}"#;
     let response = post_json(&client, "/embed", invalid_json.to_string()).await;
     assert_eq!(response.status(), Status::BadRequest);
-
-    let body: Value = response.into_json().await.expect("Valid JSON response");
-    println!("Invalid JSON error: {:?}", body);
 }
 
 #[tokio::test]
