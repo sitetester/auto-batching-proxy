@@ -103,13 +103,6 @@ async fn test_embed_endpoint_invalid_json_missing_quotes() {
 }
 
 #[tokio::test]
-async fn test_404_not_found() {
-    let client = get_client_with_defaults().await;
-    let response = client.get("/nonexistent").dispatch().await;
-    assert_eq!(response.status(), Status::NotFound);
-}
-
-#[tokio::test]
 async fn test_verify_direct_and_proxy_return_similar_results_for_single_input() {
     let inputs = vec!["What is ML ?".to_string()];
     let direct_embeddings = direct_call_to_inference_service(&inputs).await;

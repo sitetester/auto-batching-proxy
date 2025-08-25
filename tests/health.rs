@@ -12,3 +12,10 @@ async fn test_health_endpoint() {
     let body = response.into_string().await.expect("valid response body");
     assert_eq!(body, "OK");
 }
+
+#[tokio::test]
+async fn test_404_not_found() {
+    let client = get_client_with_defaults().await;
+    let response = client.get("/nonexistent").dispatch().await;
+    assert_eq!(response.status(), Status::NotFound);
+}
