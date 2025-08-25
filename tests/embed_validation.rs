@@ -121,7 +121,8 @@ async fn verify_direct_and_proxy_return_similar_results(inputs: &Vec<String>) {
     let proxy_embeddings = get_proxy_embeddings(json);
 
     // this could potentially fail due to floating point comparison
-    // test passing on ` --model-id sentence-transformers/all-MiniLM-L6-v2`
+    // currently, test passing on ` --model-id sentence-transformers/all-MiniLM-L6-v2`
+    // can choose `epsilon-based comparison` otherwise https://floating-point-gui.de/errors/comparison/
     assert_eq!(direct_embeddings, proxy_embeddings);
     // safe alternative
     assert_eq!(direct_embeddings.len(), proxy_embeddings.len());
