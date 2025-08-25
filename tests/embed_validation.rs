@@ -59,7 +59,7 @@ async fn test_embed_endpoint_fails_when_inputs_exceed_config_max_inference_input
     )
     .await;
 
-    assert_eq!(response.status(), Status::BadRequest);
+    assert_eq!(response.status(), Status::PayloadTooLarge);
 
     let body: Value = response.into_json().await.expect("Valid JSON");
     assert!(body.is_object());

@@ -26,7 +26,7 @@ pub async fn embed(
 
     if request.inputs.len() > request_handler.config.max_inference_inputs {
         return Err(Custom(
-            Status::BadRequest,
+            Status::PayloadTooLarge,
             Json(ErrorResponse {
                 error: format!(
                     "`inputs` can't be greater than {}",
