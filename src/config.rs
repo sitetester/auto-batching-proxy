@@ -87,30 +87,36 @@ impl AppConfig {
             if let Some(port) = args.port {
                 config.port = port;
             }
+
             if let Some(max_wait_time_ms) = args.max_wait_time_ms {
                 if max_wait_time_ms == 0 {
                     return Err("max_wait_time_ms must be > 0".to_string());
                 }
                 config.max_wait_time_ms = max_wait_time_ms;
             }
+
             if let Some(max_batch_size) = args.max_batch_size {
                 if max_batch_size == 0 {
                     return Err("max_batch_size must be > 0".to_string());
                 }
                 config.max_batch_size = max_batch_size;
             }
+
             if let Some(batch_check_interval_ms) = args.batch_check_interval_ms {
                 if batch_check_interval_ms == 0 {
                     return Err("batch_check_interval_ms must be > 0".to_string());
                 }
                 config.batch_check_interval_ms = batch_check_interval_ms;
             }
+
             if let Some(include_batch_info) = args.include_batch_info {
                 config.include_batch_info = include_batch_info;
             }
+
             if let Some(inference_url) = args.inference_url {
                 config.inference_url = inference_url;
             }
+
             if let Some(inference_timeout_secs) = args.inference_timeout_secs {
                 if inference_timeout_secs == 0 {
                     return Err("inference_timeout_secs must be > 0".to_string());
@@ -125,6 +131,7 @@ impl AppConfig {
                 }
                 config.max_inference_inputs = max_inference_inputs;
             }
+
             if let Some(log_level) = args.log_level {
                 config.log_level = log_level.to_string().to_lowercase();
             }
