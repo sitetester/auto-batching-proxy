@@ -325,9 +325,9 @@ mod tests {
         ];
 
         for config in configs {
-            let _interval = config.get_batch_interval();
-            // just verify it creates without panicking
-            assert!(true); // or otherwise with explicit arg
+            // explicit type annotation will make Rust compiler guarantee it's an `Interval`
+            // otherwise, test will fail :)
+            let _interval: Interval = config.get_batch_interval();
         }
     }
 }
