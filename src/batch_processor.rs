@@ -128,7 +128,7 @@ impl BatchProcessor {
         while !pending_requests.is_empty() {
             let batch = Self::build_safe_batch(pending_requests, config);
             if batch.is_empty() {
-                debug!("Batch is empty, will skip processing...");
+                warn!("UNEXPECTED: Batch is empty, will skip processing...");
                 break;
             }
 
