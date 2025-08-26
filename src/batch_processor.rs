@@ -269,6 +269,7 @@ mod tests {
 
         for _ in 1..=3 {
             let (response_sender, _): (ResponseSender, _) = oneshot::channel();
+            // each request has 5 inputs
             let pending_request = PendingRequest::new(inputs.clone(), response_sender);
             batch_processor.pending_requests.push_back(pending_request);
         }
