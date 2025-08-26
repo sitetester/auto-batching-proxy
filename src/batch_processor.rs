@@ -165,7 +165,7 @@ impl BatchProcessor {
         // `.iter()` - front-to-back iterator
         for request in pending_requests.iter() {
             if batch_size >= config.max_batch_size
-                || inputs_count + request.inputs.len() > config.max_inference_inputs
+                || (inputs_count + request.inputs.len()) > config.max_inference_inputs
             {
                 break;
             }
