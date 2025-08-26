@@ -253,8 +253,8 @@ mod tests {
             batch_processor.pending_requests.push_back(pending_request);
         }
 
-        let result = batch_processor.build_safe_batch();
-        assert_eq!(result.len(), 5);
+        let batch = batch_processor.build_safe_batch();
+        assert_eq!(batch.len(), 5);
     }
 
     #[test]
@@ -273,7 +273,7 @@ mod tests {
             batch_processor.pending_requests.push_back(pending_request);
         }
 
-        let result = batch_processor.build_safe_batch();
-        assert_eq!(result.len(), 2);
+        let batch = batch_processor.build_safe_batch();
+        assert_eq!(batch.len(), 2);
     }
 }
