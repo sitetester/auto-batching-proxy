@@ -168,15 +168,9 @@ impl BatchProcessor {
     fn handle_batch_success(
         batch: Vec<PendingRequest>,
         embeddings: BatchResponse,
-        mut batch_info: Option<BatchInfo>,
+        batch_info: Option<BatchInfo>,
         start_time: Instant,
     ) {
-        info!(
-            "Batch processed successfully in {:?}, {} embeddings returned",
-            start_time.elapsed(),
-            embeddings.len()
-        );
-
         let mut current_index = 0;
 
         for pending_request in batch {
@@ -187,11 +181,6 @@ impl BatchProcessor {
                 .get(start_idx..end_idx)
                 .map(|slice| slice.to_vec())
                 .unwrap_or_default();
-
-            if let Some(ref mut info) = batch_info {
-                // each batch should calculate its own processing time
-                info.processing_time_ms = Some(start_time.elapsed().as_millis() as f64);
-            }
 
             let response = EmbedResponse {
                 embeddings: individual_embeddings,
@@ -205,6 +194,12 @@ impl BatchProcessor {
 
             current_index = end_idx;
         }
+
+        info!(
+            "Batch processed successfully in {:?}ms, {} embeddings returned",
+            start_time.elapsed().as_millis() as f64,
+            embeddings.len()
+        );
     }
 
     fn handle_batch_error(batch: Vec<PendingRequest>, error: InferenceError) {

@@ -29,7 +29,6 @@ pub struct BatchInfo {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub batch_wait_time_ms: Option<u64>,
     pub inference_time_ms: Option<f64>,
-    pub processing_time_ms: Option<f64>,
 }
 
 pub static BATCH_COUNTER: AtomicU64 = AtomicU64::new(1);
@@ -45,8 +44,7 @@ impl BatchInfo {
             batch_type,
             batch_size: Some(batch_size),
             batch_wait_time_ms,
-            inference_time_ms: None,  // filled later in process_batch(...)
-            processing_time_ms: None, // as above
+            inference_time_ms: None, // filled later in process_batch(...)
         }
     }
 }
