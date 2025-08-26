@@ -179,14 +179,14 @@ async fn test_compare_single_input_inference_service_vs_auto_batching_proxy_with
     }
 
     let print_timing = |proxy_timings| {
-        println!("{} {:^20} {:^15}", "Requests", "Direct", "Proxy");
+        println!("Requests {:^20} {:^15}", "Direct", "Proxy");
         for (num_requests, proxy_elapsed) in proxy_timings {
             println!(
                 "{:^5} {:^25} {:^10}",
                 num_requests,
                 direct_timings
                     .get(&num_requests)
-                    .map_or("N/A".to_string(), |elapsed| format!("{:?}", elapsed)),
+                    .map_or("N/A".to_string(), |elapsed| format!("{elapsed:?}")),
                 format!("{:?}", proxy_elapsed)
             );
         }

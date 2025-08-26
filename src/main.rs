@@ -10,7 +10,7 @@ use rocket::{Build, Rocket, launch};
 async fn rocket() -> Rocket<Build> {
     let args = Args::parse();
     let config = AppConfig::build(Some(args)).unwrap_or_else(|err| {
-        eprintln!("Configuration error: {}", err);
+        eprintln!("Configuration error: {err}");
         std::process::exit(1);
     });
 

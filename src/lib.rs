@@ -18,7 +18,7 @@ use std::sync::Arc;
 #[catch(default)]
 fn json_error_catcher(status: Status, _req: &Request) -> Json<ErrorResponse> {
     Json(ErrorResponse {
-        error: format!("{}", status.reason().unwrap_or("Unknown Error")),
+        error: status.reason().unwrap_or("Unknown Error").to_string(),
     })
 }
 

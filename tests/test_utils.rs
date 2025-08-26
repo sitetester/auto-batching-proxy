@@ -69,8 +69,7 @@ pub async fn launch_threads_with_tests(
                 for (i, embedding) in embeddings.iter().enumerate() {
                     assert!(
                         embedding.is_array(),
-                        "Embedding {} should be an array of numbers",
-                        i
+                        "Embedding {i} should be an array of numbers"
                     );
 
                     let embedding_values = embedding.as_array().unwrap();
@@ -117,7 +116,7 @@ pub fn build_inputs(num: usize, mut maybe_input: Option<&str>) -> Vec<String> {
     let inputs: Vec<String> = if num == 1 {
         vec![input.to_string()]
     } else {
-        (1..=num).map(|i| format!("{}: {}", i, input)).collect()
+        (1..=num).map(|i| format!("{i}: {input}")).collect()
     };
 
     inputs

@@ -30,11 +30,11 @@ impl InferenceError {
 
     pub fn message(&self) -> String {
         match self {
-            InferenceError::NetworkError(e) => format!("Network error: {}", e),
+            InferenceError::NetworkError(e) => format!("Network error: {e}"),
             InferenceError::HttpError { status, body } => {
-                format!("HTTP {}: {}", status, body)
+                format!("HTTP {status}: {body}")
             }
-            InferenceError::ParseError(e) => format!("Parse error: {}", e),
+            InferenceError::ParseError(e) => format!("Parse error: {e}"),
         }
     }
 }

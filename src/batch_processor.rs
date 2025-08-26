@@ -77,7 +77,7 @@ impl BatchProcessor {
                     "Processing due to config.max_wait_time_ms: {} timeout",
                     self.config.max_wait_time_ms
                 );
-                debug!("Oldest request waited {:?}", elapsed);
+                debug!("Oldest request waited {elapsed:?}");
                 self.process_pending_requests(BatchType::MaxWaitTimeMs);
             }
         }
@@ -86,7 +86,7 @@ impl BatchProcessor {
     /// To avoid overwhelming the inference service, it will process in batches
     /// respecting `config.max_batch_size` as well as `config.max_inference_inputs`
     fn process_pending_requests(&mut self, batch_type: BatchType) {
-        info!("Processing batch type: {:?}...", batch_type);
+        info!("Processing batch type: {batch_type:?}...");
 
         let mut batch_wait_time_ms = Some(self.config.max_wait_time_ms);
         if batch_type == BatchType::MaxBatchSize {
@@ -106,7 +106,7 @@ impl BatchProcessor {
             }
 
             let batch_size = batch.len();
-            info!("Processing batch size: {}", batch_size);
+            info!("Processing batch size: {batch_size}");
 
             let batch_info = if self.config.include_batch_info {
                 Some(BatchInfo::new(batch_type, batch_size, batch_wait_time_ms))
@@ -204,7 +204,7 @@ impl BatchProcessor {
 
     /// Will simply send an error response to each user
     fn handle_batch_error(batch: Vec<PendingRequest>, error: InferenceError) {
-        error!("Batch processing failed: {:?}", error);
+        error!("Batch processing failed: {error:?}");
 
         let error_response = Custom(
             error.to_rocket_status(),
@@ -268,7 +268,7 @@ mod tests {
         config.max_inference_inputs = 10;
         let mut batch_processor = build_batch_processor(config);
 
-        let inputs: Vec<String> = (1..=5).map(|i| format!("{}: What is NLP", i)).collect();
+        let inputs: Vec<String> = (1..=5).map(|i| format!("{i}: What is NLP")).collect();
 
         for _ in 1..=3 {
             let (response_sender, _): (ResponseSender, _) = oneshot::channel();

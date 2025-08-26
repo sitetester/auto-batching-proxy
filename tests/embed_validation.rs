@@ -104,7 +104,7 @@ async fn test_embed_endpoint_invalid_json_missing_quotes() {
 
 // helper / utility function (not an actual test)
 async fn verify_direct_and_proxy_return_similar_results(inputs: &Vec<String>) {
-    let direct_embeddings = direct_call_to_inference_service(&inputs).await;
+    let direct_embeddings = direct_call_to_inference_service(inputs).await;
 
     let client = get_client_with_defaults().await;
     let response = post_json(
