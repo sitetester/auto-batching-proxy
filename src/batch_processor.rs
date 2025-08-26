@@ -234,7 +234,6 @@ mod tests {
     use tokio::sync::oneshot;
 
     fn build_batch_processor(config: AppConfig) -> BatchProcessor {
-        // create this client ONCE & return potential error (not possible from inside `tokio::spawn`)
         let inference_client = InferenceServiceClient::new(&config).unwrap();
         BatchProcessor::new(config, inference_client)
     }
