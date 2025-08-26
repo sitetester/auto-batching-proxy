@@ -31,7 +31,10 @@ but our proxy will respect this config param & will not send requests (as well a
 
 ## Setup Proxy Service
 - either run `cargo run` at root of the project, it will launch Rocket [with default configuration params](./screenshots/cargo/cargo_run.png)
-- or otherwise [with custom params](./screenshots/cargo/cargo_run_with_params.png) like `RUST_LOG=INFO cargo run -- --max-batch-size 100 --max-wait-time-ms 3000`
+- or otherwise [with custom params](./screenshots/cargo/cargo_run_with_params.png) like 
+```
+RUST_LOG=INFO cargo run -- --max-batch-size 50 --max-wait-time-ms 3000
+```
 
 
 **[Unit tests](https://doc.rust-lang.org/book/ch11-03-test-organization.html#unit-tests)**   
