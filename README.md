@@ -18,8 +18,7 @@ docker run --rm -it -p 8080:80 --pull always \
 ```
 if it fails to start, then try with some other alternatives. Currently, code is functional for  
 `--model-id sentence-transformers/all-MiniLM-L6-v2` & `--model-id sentence-transformers/all-mpnet-base-v2`
-Check [nomic-embed-text-v1.5_FAILED.png](screenshots/run_model_status/nomic-embed-text-v1.5_FAILED.png) & others 
-inside [/screenshots](./screenshots)
+Check [/screenshots](./screenshots) for some of the tried models.
 
 ```
 docker run --rm -it -p 8080:80 --pull always \
