@@ -71,13 +71,13 @@ impl BatchProcessor {
     /// User4 request with 5 inputs arrives at 500th ms
     fn handle_max_wait_time_ms(&mut self) {
         if let Some(oldest_request) = self.pending_requests.front() {
-            let received_at = oldest_request.received_at;
-            if received_at.elapsed() >= self.config.max_wait_time_duration() {
+            let elapsed = oldest_request.received_at.elapsed();
+            if elapsed >= self.config.max_wait_time_duration() {
                 info!(
                     "Processing due to config.max_wait_time_ms: {} timeout",
                     self.config.max_wait_time_ms
                 );
-                debug!("Oldest request waited {:?}", received_at.elapsed());
+                debug!("Oldest request waited {:?}", elapsed);
                 self.process_pending_requests(BatchType::MaxWaitTimeMs);
             }
         }
