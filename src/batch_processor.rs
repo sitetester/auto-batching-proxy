@@ -162,6 +162,7 @@ impl BatchProcessor {
         let mut batch_size = 0;
         let mut inputs_count = 0;
 
+        // `.iter()` - front-to-back iterator
         for request in pending_requests.iter() {
             if batch_size >= config.max_batch_size
                 || inputs_count + request.inputs.len() > config.max_inference_inputs
