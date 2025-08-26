@@ -29,7 +29,7 @@ docker run --rm -it -p 8080:80 --pull always \
 Note: [Backend does not support a batch size > 8](screenshots/run_model_status/max_batch_size.png)
 but our proxy will respect this config param & will not send requests (as well as max inputs, which is 32 for `all-MiniLM-L6-v2`) more than supported batch size. 
 
-## Setup Proxy service
+## Setup Proxy Service
 - either run `cargo run` at root of the project, it will launch Rocket [with default configuration params](./screenshots/cargo/cargo_run.png)
 - or otherwise [with custom params](./screenshots/cargo/cargo_run_with_params.png) like `RUST_LOG=INFO cargo run -- --max-batch-size 100 --max-wait-time-ms 3000`
 
