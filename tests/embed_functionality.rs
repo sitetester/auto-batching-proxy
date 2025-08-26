@@ -162,9 +162,9 @@ async fn test_compare_single_input_inference_service_vs_auto_batching_proxy_with
     };
 
     let client = Arc::new(get_client(config).await);
-    let requests = [1, 5];
+     let requests = [1, 5, 10, 25, 30, 50, 75, 100, 200, 500, 1000];
 
-    // test different request counts
+     // test different request counts
     let mut direct_timings: BTreeMap<usize, Duration> = BTreeMap::new();
     for &num_requests in &requests {
         let start_time = std::time::Instant::now();

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use tokio::time::Interval;
 
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Default)]
 #[command(author, version, about, long_about = None)]
 pub struct Args {
     /// Rocket server port to run the proxy on
@@ -212,26 +212,12 @@ mod tests {
         assert_eq!(config.log_level, "debug".to_string());
     }
 
-    fn get_empty_args() -> Args {
-        Args {
-            port: None,
-            max_wait_time_ms: None,
-            max_batch_size: None,
-            batch_check_interval_ms: None,
-            include_batch_info: None,
-            inference_url: None,
-            inference_timeout_secs: None,
-            max_inference_inputs: None,
-            log_level: None,
-        }
-    }
-
     #[test]
     fn test_build_from_partial_args() {
         let partial_args = Args {
             port: Some(5000),
             max_batch_size: Some(25),
-            ..get_empty_args()
+            ..Args::default()
         };
 
         let config = AppConfig::build(Some(partial_args));
@@ -258,7 +244,7 @@ mod tests {
     fn test_build_fails_when_max_batch_size_is_0() {
         let invalid_args = Args {
             max_batch_size: Some(0),
-            ..get_empty_args()
+            ..Args::default()
         };
 
         let config = AppConfig::build(Some(invalid_args));
@@ -269,7 +255,7 @@ mod tests {
     fn test_build_fails_when_max_wait_time_ms_is_0() {
         let invalid_args = Args {
             max_wait_time_ms: Some(0),
-            ..get_empty_args()
+            ..Args::default()
         };
 
         let config = AppConfig::build(Some(invalid_args));
@@ -280,7 +266,7 @@ mod tests {
     fn test_build_fails_when_batch_check_interval_ms_is_0() {
         let invalid_args = Args {
             batch_check_interval_ms: Some(0),
-            ..get_empty_args()
+            ..Args::default()
         };
 
         let config = AppConfig::build(Some(invalid_args));
@@ -291,7 +277,7 @@ mod tests {
     fn test_build_fails_when_inference_timeout_secs_is_0() {
         let invalid_args = Args {
             inference_timeout_secs: Some(0),
-            ..get_empty_args()
+            ..Args::default()
         };
 
         let config = AppConfig::build(Some(invalid_args));
@@ -302,7 +288,7 @@ mod tests {
     fn test_build_fails_when_max_inference_inputs_is_0() {
         let invalid_args = Args {
             max_inference_inputs: Some(0),
-            ..get_empty_args()
+            ..Args::default()
         };
 
         let config = AppConfig::build(Some(invalid_args));

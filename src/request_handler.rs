@@ -2,7 +2,7 @@ use crate::batch_processor::BatchProcessor;
 use crate::config::AppConfig;
 use crate::inference_client::InferenceServiceClient;
 use crate::types::{
-    EmbedRequest, EmbedResponse, ErrorResponse, ResponseReceiver, ResponseSender, PendingRequest,
+    EmbedRequest, EmbedResponse, ErrorResponse, PendingRequest, ResponseReceiver, ResponseSender,
 };
 use rocket::http::Status;
 use rocket::response::status::Custom;
