@@ -62,8 +62,8 @@ impl BatchProcessor {
                     }
                 }
                 // imagine only 1 request arrived, but then there are no new requests,
-                // can cause timeout without even executing `handle_max_wait_time_ms()` for older requests,
-                // having ticker ensures, this branch runs & eventually processes `handle_max_wait_time_ms()`
+                // can cause timeout without even executing `handle_max_wait_time_ms(...)` for older requests,
+                // having ticker ensures, this branch runs & eventually processes `handle_max_wait_time_ms(...)`
                 _ = batch_interval.tick() => {
                    // periodic wakeup to check pending requests
                 }
@@ -75,7 +75,7 @@ impl BatchProcessor {
     }
 
     /// ```Max Wait Time - maximal time user request can wait for other requests to be accumulated in a batch```
-    /// 
+    ///
     /// let's assume, we have such timeline, at 500th ms, we process all requests in single batch,
     /// but also consider `max_inference_inputs` limitation
     ///
