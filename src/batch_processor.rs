@@ -121,7 +121,7 @@ impl BatchProcessor {
         let mut batch_wait_time_ms = Some(config.max_wait_time_ms);
         if batch_type == BatchType::MaxBatchSize {
             // to avoid confusion (whether size or timing), let's not show this info in returned
-            // BatchInfo results (in tests), also check ```skip_serializing_if = "Option::is_none"```
+            // BatchInfo results in tests, also check ```skip_serializing_if = "Option::is_none"```
             batch_wait_time_ms = None;
         }
 
