@@ -47,9 +47,11 @@ pub struct Args {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AppConfig {
     pub port: u16,
+    /// Maximal time user request can wait for other requests to be accumulated in a batch
     pub max_wait_time_ms: u64,
+    /// Maximal number of requests that can be accumulated in a batch.
     pub max_batch_size: usize,
-    /// Very small value will cause unnecessary CUP high load, higher value will cause poor API responsiveness
+    /// Very small value will cause unnecessary CUP high load, higher value will cause poor API response
     pub batch_check_interval_ms: u64,
     pub include_batch_info: bool,
     pub inference_url: String,
