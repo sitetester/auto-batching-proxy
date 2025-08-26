@@ -77,7 +77,7 @@ impl BatchProcessor {
                     "Processing due to config.max_wait_time_ms: {} timeout",
                     self.config.max_wait_time_ms
                 );
-                debug!("oldest request waited {:?}", received_at.elapsed());
+                debug!("Oldest request waited {:?}", received_at.elapsed());
                 self.process_pending_requests(BatchType::MaxWaitTimeMs);
             }
         }
