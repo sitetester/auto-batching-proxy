@@ -21,6 +21,7 @@ impl BatchProcessor {
         config: &AppConfig,
         request_receiver: mpsc::UnboundedReceiver<PendingRequest>,
     ) -> Result<Self, anyhow::Error> {
+        // create this client ONCE & return potential error (not possible from inside `tokio::spawn`)
         let inference_client = InferenceServiceClient::new(&config)?;
 
         // check `RequestHandler::process_request(..)` how such requests are sent via `request_sender`
