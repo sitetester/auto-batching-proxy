@@ -175,6 +175,7 @@ impl BatchProcessor {
         for pending_request in batch {
             let end_idx = start_idx + pending_request.inputs.len();
 
+            // check ```assert_eq!(embeddings.len(), inputs.len())``` in test_utils to verify logic
             let individual_embeddings = embeddings
                 .get(start_idx..end_idx)
                 .map(|slice| slice.to_vec())
