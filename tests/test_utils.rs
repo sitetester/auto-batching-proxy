@@ -1,3 +1,5 @@
+#![allow(dead_code)] // for some reason, it's generating warnings for used functions
+
 use auto_batching_proxy::types::{BatchInfo, BatchType};
 use auto_batching_proxy::{build_rocket, config::AppConfig};
 use rocket::http::ContentType;

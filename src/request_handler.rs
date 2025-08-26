@@ -1,5 +1,6 @@
 use crate::batch_processor::BatchProcessor;
 use crate::config::AppConfig;
+use crate::inference_client::InferenceServiceClient;
 use crate::types::{EmbedRequest, EmbedResponse, ErrorResponse, PendingRequest};
 use rocket::http::Status;
 use rocket::response::status::Custom;
@@ -23,9 +24,13 @@ impl RequestHandler {
             mpsc::UnboundedReceiver<PendingRequest>,
         ) = mpsc::unbounded_channel(); // non-blocking
 
-        BatchProcessor::new(&config, request_receiver)
-            .await
-            .map_err(|e| anyhow::anyhow!("Failed to create BatchProcessor: {}", e))?;
+        // create this client once & return potential error
+        let inference_client = InferenceServiceClient::new(&config)
+            .map_err(|e| anyhow::anyhow!("Failed to create InferenceServiceClient: {}", e))?;
+
+        let batch_processor = BatchProcessor::new(config.clone(), inference_client);
+        // launch `run` as a background task
+        tokio::spawn(batch_processor.run(request_receiver));
 
         Ok(Self {
             config,

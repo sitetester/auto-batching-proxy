@@ -8,42 +8,30 @@ use rocket::response::status::Custom;
 use rocket::serde::json::Json;
 use std::collections::VecDeque;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 use tokio::sync::mpsc;
 
-pub static BATCH_COUNTER: AtomicU64 = AtomicU64::new(1);
-
-pub struct BatchProcessor {}
+pub struct BatchProcessor {
+    config: AppConfig,
+    inference_client: Arc<InferenceServiceClient>,
+    /// Owned (not shared), should have no concurrent race issues
+    pending_requests: VecDeque<PendingRequest>,
+}
 
 impl BatchProcessor {
-    pub async fn new(
-        config: &AppConfig,
-        request_receiver: mpsc::UnboundedReceiver<PendingRequest>,
-    ) -> Result<Self, anyhow::Error> {
-        // create this client ONCE & return potential error (not possible from inside `tokio::spawn`)
-        let inference_client = InferenceServiceClient::new(&config)?;
-
-        // check `RequestHandler::process_request(..)` how such requests are sent via `request_sender`
-        tokio::spawn(Self::run_batch_processor(
-            config.clone(),
-            request_receiver,
-            inference_client,
-        ));
-
-        Ok(Self {})
+    pub fn new(config: AppConfig, inference_client: InferenceServiceClient) -> Self {
+        Self {
+            config,
+            inference_client: Arc::new(inference_client),
+            pending_requests: VecDeque::new(),
+        }
     }
 
-    async fn run_batch_processor(
-        config: AppConfig,
-        mut request_receiver: mpsc::UnboundedReceiver<PendingRequest>,
-        inference_client: InferenceServiceClient,
-    ) {
-        let inference_client = Arc::new(inference_client);
-        let mut pending_requests: VecDeque<PendingRequest> = VecDeque::new();
-        let mut batch_interval =
-            tokio::time::interval(Duration::from_millis(config.batch_check_interval_ms));
-        batch_interval.tick().await; // skip the first immediate tick call as it returns immediately (at time 0)
+    /// Only single `run` instance is launched from `RequestHandler`
+    pub async fn run(mut self, mut request_receiver: mpsc::UnboundedReceiver<PendingRequest>) {
+        let mut batch_interval = self.config.get_batch_interval();
+        // skip the first immediate tick call as it returns immediately (at time 0)
+        batch_interval.tick().await;
 
         loop {
             tokio::select! {
@@ -53,12 +41,10 @@ impl BatchProcessor {
 
                         // `max_inference_inputs` check is applied inside `/embed` route (routes.rs)
                         // & batch size limits are enforced in `build_safe_batch()`
-                        pending_requests.push_back(request);
+                        self.pending_requests.push_back(request);
 
-                        if pending_requests.len() >= config.max_batch_size {
-                            Self::process_pending_requests(&mut pending_requests, &config, &inference_client,
-                                BatchType::MaxBatchSize
-                            );
+                        if self.pending_requests.len() >= self.config.max_batch_size {
+                            self.process_pending_requests(BatchType::MaxBatchSize);
                         }
                     }
                 }
@@ -71,7 +57,7 @@ impl BatchProcessor {
             }
 
             // it will reach here, irrespective of which `tokio::select!` branch was picked
-            Self::handle_max_wait_time_ms(&mut pending_requests, &config, &inference_client);
+            self.handle_max_wait_time_ms();
         }
     }
 
@@ -84,51 +70,43 @@ impl BatchProcessor {
     /// User2 request with 20 inputs arrives at 100th ms
     /// User3 request with 10 inputs arrives at 300th ms // exceeds max_inference_inputs of e.g., 32
     /// User4 request with 5 inputs arrives at 500th ms
-    fn handle_max_wait_time_ms(
-        pending_requests: &mut VecDeque<PendingRequest>,
-        config: &AppConfig,
-        inference_client: &Arc<InferenceServiceClient>,
-    ) {
-        if let Some(oldest_request) = pending_requests.front() {
+    fn handle_max_wait_time_ms(&mut self) {
+        if let Some(oldest_request) = self.pending_requests.front() {
             let received_at = oldest_request.received_at;
 
-            if received_at.elapsed() >= config.max_wait_time_duration() {
+            if received_at.elapsed() >= self.config.max_wait_time_duration() {
                 info!(
                     "Processing due to config.max_wait_time_ms: {} timeout",
-                    config.max_wait_time_ms
+                    self.config.max_wait_time_ms
                 );
                 debug!("oldest request waited {:?}", received_at.elapsed());
-                Self::process_pending_requests(
-                    pending_requests,
-                    config,
-                    inference_client,
-                    BatchType::MaxWaitTimeMs,
-                )
+                self.process_pending_requests(BatchType::MaxWaitTimeMs);
             }
         }
     }
 
     /// To avoid overwhelming the inference service, it will process in batches
     /// respecting `config.max_batch_size` as well as `config.max_inference_inputs`
-    fn process_pending_requests(
-        pending_requests: &mut VecDeque<PendingRequest>,
-        config: &AppConfig,
-        inference_client: &Arc<InferenceServiceClient>,
-        batch_type: BatchType,
-    ) {
+    fn process_pending_requests(&mut self, batch_type: BatchType) {
         info!("Processing batch type: {:?}...", batch_type);
 
-        let mut batch_wait_time_ms = Some(config.max_wait_time_ms);
+        let mut batch_wait_time_ms = Some(self.config.max_wait_time_ms);
         if batch_type == BatchType::MaxBatchSize {
             // to avoid confusion (whether size or timing), let's not show this info in returned
             // BatchInfo results in tests, also check ```skip_serializing_if = "Option::is_none"```
             batch_wait_time_ms = None;
         }
 
-        while !pending_requests.is_empty() {
-            let batch = Self::build_safe_batch(pending_requests, config);
+        while !self.pending_requests.is_empty() {
+            let batch = self.build_safe_batch();
             if batch.is_empty() {
-                warn!("UNEXPECTED: Batch is empty, will skip processing...");
+                error!(
+                    "UNEXPECTED: build_safe_batch returned empty with {} pending requests. \
+                     This indicates a validation logic bug. Config: max_batch_size={}, max_inference_inputs={}",
+                    self.pending_requests.len(),
+                    self.config.max_batch_size,
+                    self.config.max_inference_inputs
+                );
                 break;
             }
 
@@ -136,37 +114,31 @@ impl BatchProcessor {
             info!("Processing batch size: {}", batch_size);
 
             let mut batch_info = None;
-            if config.include_batch_info {
-                batch_info = Some(BatchInfo {
-                    batch_id: BATCH_COUNTER.fetch_add(1, Ordering::Relaxed),
+            if self.config.include_batch_info {
+                batch_info = Some(BatchInfo::new(
                     batch_type,
-                    batch_size: Some(batch_size),
+                    batch_size,
                     batch_wait_time_ms,
-                    inference_time_ms: None, // filled later in process_batch(...)
-                    processing_time_ms: None, // as above
-                });
+                ));
             }
 
             tokio::spawn(Self::process_batch(
                 batch,
-                inference_client.clone(),
+                self.inference_client.clone(),
                 batch_info,
             ));
         }
     }
 
     /// It will build a batch while respecting `config.max_batch_size` & `config.max_inference_inputs`
-    fn build_safe_batch(
-        pending_requests: &mut VecDeque<PendingRequest>,
-        config: &AppConfig,
-    ) -> Vec<PendingRequest> {
+    fn build_safe_batch(&mut self) -> Vec<PendingRequest> {
         let mut batch_size = 0;
         let mut inputs_count = 0;
 
         // `.iter()` - front-to-back iterator
-        for request in pending_requests.iter() {
-            if batch_size >= config.max_batch_size
-                || (inputs_count + request.inputs.len()) > config.max_inference_inputs
+        for request in self.pending_requests.iter() {
+            if batch_size >= self.config.max_batch_size
+                || (inputs_count + request.inputs.len()) > self.config.max_inference_inputs
             {
                 break;
             }
@@ -175,7 +147,7 @@ impl BatchProcessor {
         }
 
         debug!("[build_safe_batch] batch_size: {}", batch_size);
-        pending_requests.drain(..batch_size).collect()
+        self.pending_requests.drain(..batch_size).collect()
     }
 
     async fn process_batch(
@@ -236,6 +208,7 @@ impl BatchProcessor {
                 .unwrap_or_default();
 
             if let Some(ref mut info) = batch_info {
+                // each batch should calculate its own processing time
                 info.processing_time_ms = Some(start_time.elapsed().as_millis() as f64);
             }
 
@@ -279,28 +252,36 @@ impl BatchProcessor {
 mod tests {
     use crate::batch_processor::BatchProcessor;
     use crate::config::AppConfig;
+    use crate::inference_client::InferenceServiceClient;
     use crate::types::{EmbedResponse, ErrorResponse, PendingRequest};
     use rocket::response::status::Custom;
     use rocket::serde::json::Json;
-    use std::collections::VecDeque;
     use tokio::sync::oneshot;
     use tokio::sync::oneshot::Sender;
 
     type ResponseSender = Sender<Result<EmbedResponse, Custom<Json<ErrorResponse>>>>;
+
+    fn build_batch_processor(config: AppConfig) -> BatchProcessor {
+        // create this client ONCE & return potential error (not possible from inside `tokio::spawn`)
+        let inference_client = InferenceServiceClient::new(&config).unwrap();
+        BatchProcessor::new(config, inference_client)
+    }
 
     #[test]
     fn test_build_safe_batch_max_batch_size() {
         let mut config = AppConfig::default();
         config.max_batch_size = 5;
 
-        let mut pending_requests = VecDeque::new();
+        let mut batch_processor = build_batch_processor(config);
+
+        // let mut pending_requests = VecDeque::new();
         for _ in 1..=10 {
             let (response_sender, _): (ResponseSender, _) = oneshot::channel();
             let pending_request = PendingRequest::new(vec!["Hello".to_string()], response_sender);
-            pending_requests.push_back(pending_request);
+            batch_processor.pending_requests.push_back(pending_request);
         }
 
-        let result = BatchProcessor::build_safe_batch(&mut pending_requests, &config);
+        let result = batch_processor.build_safe_batch();
         assert_eq!(result.len(), 5);
     }
 
@@ -308,17 +289,17 @@ mod tests {
     fn test_build_safe_batch_max_inference_inputs() {
         let mut config = AppConfig::default();
         config.max_inference_inputs = 10;
+        let mut batch_processor = build_batch_processor(config);
 
         let inputs: Vec<String> = (1..=5).map(|i| format!("{}: What is NLP", i)).collect();
 
-        let mut pending_requests = VecDeque::new();
         for _ in 1..=3 {
             let (response_sender, _): (ResponseSender, _) = oneshot::channel();
             let pending_request = PendingRequest::new(inputs.clone(), response_sender);
-            pending_requests.push_back(pending_request);
+            batch_processor.pending_requests.push_back(pending_request);
         }
 
-        let result = BatchProcessor::build_safe_batch(&mut pending_requests, &config);
+        let result = batch_processor.build_safe_batch();
         assert_eq!(result.len(), 2);
     }
 }

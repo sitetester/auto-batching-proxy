@@ -2,6 +2,7 @@ use clap::Parser;
 use rocket::log::LogLevel;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
+use tokio::time::Interval;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -141,6 +142,10 @@ impl AppConfig {
 
     pub fn max_wait_time_duration(&self) -> Duration {
         Duration::from_millis(self.max_wait_time_ms)
+    }
+
+    pub fn get_batch_interval(&self) -> Interval {
+        tokio::time::interval(Duration::from_millis(self.batch_check_interval_ms))
     }
 
     /// Initialize logging with env_logger (simpler approach)
@@ -303,5 +308,26 @@ mod tests {
 
         let config = AppConfig::build(Some(invalid_args));
         assert!(config.is_err());
+    }
+
+    #[tokio::test] // Must be ```tokio::``` prefixed
+    async fn test_get_batch_interval() {
+        let configs = [
+            AppConfig::default(),
+            AppConfig {
+                batch_check_interval_ms: 1,
+                ..AppConfig::default()
+            },
+            AppConfig {
+                batch_check_interval_ms: 1000,
+                ..AppConfig::default()
+            },
+        ];
+
+        for config in configs {
+            let _interval = config.get_batch_interval();
+            // just verify it creates without panicking
+            assert!(true); // or otherwise with explicit arg
+        }
     }
 }

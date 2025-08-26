@@ -1,6 +1,7 @@
 use rocket::response::status::Custom;
 use rocket::serde::json::Json;
 use serde::{Deserialize, Serialize};
+use std::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Serialize, Debug, Clone)]
 pub struct ErrorResponse {
@@ -29,6 +30,25 @@ pub struct BatchInfo {
     pub batch_wait_time_ms: Option<u64>,
     pub inference_time_ms: Option<f64>,
     pub processing_time_ms: Option<f64>,
+}
+
+pub static BATCH_COUNTER: AtomicU64 = AtomicU64::new(1);
+
+impl BatchInfo {
+    pub fn new(
+        batch_type: BatchType,
+        batch_size: usize,
+        batch_wait_time_ms: Option<u64>,
+    ) -> BatchInfo {
+        BatchInfo {
+            batch_id: BATCH_COUNTER.fetch_add(1, Ordering::Relaxed),
+            batch_type,
+            batch_size: Some(batch_size),
+            batch_wait_time_ms,
+            inference_time_ms: None,  // filled later in process_batch(...)
+            processing_time_ms: None, // as above
+        }
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
