@@ -202,7 +202,7 @@ impl BatchProcessor {
         );
     }
 
-    /// Will simply send an error response
+    /// Will simply send an error response to each user
     fn handle_batch_error(batch: Vec<PendingRequest>, error: InferenceError) {
         error!("Batch processing failed: {:?}", error);
 
