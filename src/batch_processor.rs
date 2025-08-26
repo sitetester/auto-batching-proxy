@@ -138,7 +138,6 @@ impl BatchProcessor {
             batch_size += 1;
         }
 
-        debug!("[build_safe_batch] batch_size: {}", batch_size);
         self.pending_requests.drain(..batch_size).collect()
     }
 
