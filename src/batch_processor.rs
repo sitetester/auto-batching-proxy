@@ -8,7 +8,7 @@ use rocket::response::status::Custom;
 use rocket::serde::json::Json;
 use std::collections::VecDeque;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 use tokio::sync::mpsc;
 
 pub struct BatchProcessor {
@@ -144,23 +144,20 @@ impl BatchProcessor {
     async fn process_batch(
         batch: Vec<PendingRequest>,
         inference_client: Arc<InferenceServiceClient>,
-        batch_info: Option<BatchInfo>,
+        mut batch_info: Option<BatchInfo>,
     ) {
         let start_time = Instant::now();
-        let batch_response = inference_client
+        let inference_response = inference_client
             .call_service(BatchRequest::prepare_request(&batch))
             .await;
-        let inference_time_ms = start_time.elapsed();
 
-        match batch_response {
+        if let Some(ref mut info) = batch_info {
+            info.inference_time_ms = Some(start_time.elapsed().as_millis() as f64);
+        }
+
+        match inference_response {
             Ok(embeddings) => {
-                Self::handle_batch_success(
-                    batch,
-                    embeddings,
-                    batch_info,
-                    start_time,
-                    inference_time_ms,
-                );
+                Self::handle_batch_success(batch, embeddings, batch_info, start_time);
             }
             Err(e) => {
                 Self::handle_batch_error(batch, e);
@@ -173,7 +170,6 @@ impl BatchProcessor {
         embeddings: BatchResponse,
         mut batch_info: Option<BatchInfo>,
         start_time: Instant,
-        inference_time_ms: Duration,
     ) {
         info!(
             "Batch processed successfully in {:?}, {} embeddings returned",
@@ -182,12 +178,6 @@ impl BatchProcessor {
         );
 
         let mut current_index = 0;
-        let batch_size = batch.len();
-
-        if let Some(ref mut info) = batch_info {
-            info.inference_time_ms = Some(inference_time_ms.as_millis() as f64);
-            info.batch_size = Some(batch_size);
-        }
 
         for pending_request in batch {
             let start_idx = current_index;
