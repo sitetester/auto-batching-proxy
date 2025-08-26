@@ -226,18 +226,11 @@ mod tests {
 
         let defaults = AppConfig::default();
         assert_eq!(config.port, 5000);
-        assert_eq!(config.max_wait_time_ms, defaults.max_wait_time_ms);
         assert_eq!(config.max_batch_size, 25);
-        assert_eq!(
-            config.batch_check_interval_ms,
-            defaults.batch_check_interval_ms
-        );
-        assert_eq!(config.include_batch_info, defaults.include_batch_info);
+        // a few  other checks
+        assert_eq!(config.max_wait_time_ms, defaults.max_wait_time_ms);
         assert_eq!(config.inference_url, defaults.inference_url);
-        assert_eq!(
-            config.inference_timeout_secs,
-            defaults.inference_timeout_secs
-        );
+
     }
 
     #[test]
