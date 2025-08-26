@@ -247,7 +247,6 @@ mod tests {
 
         let mut batch_processor = build_batch_processor(config);
 
-        // let mut pending_requests = VecDeque::new();
         for _ in 1..=10 {
             let (response_sender, _): (ResponseSender, _) = oneshot::channel();
             let pending_request = PendingRequest::new(vec!["Hello".to_string()], response_sender);
