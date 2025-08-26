@@ -99,11 +99,8 @@ impl BatchProcessor {
             let batch = self.build_safe_batch();
             if batch.is_empty() {
                 error!(
-                    "UNEXPECTED: build_safe_batch returned empty with {} pending requests. \
-                     This indicates a validation logic bug. Config: max_batch_size={}, max_inference_inputs={}",
-                    self.pending_requests.len(),
-                    self.config.max_batch_size,
-                    self.config.max_inference_inputs
+                    "UNEXPECTED: build_safe_batch returned empty with {} pending requests",
+                    self.pending_requests.len()
                 );
                 break;
             }
