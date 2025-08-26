@@ -79,7 +79,6 @@ impl BatchProcessor {
     /// let's assume, we have such timeline, at 500th ms, we process all requests in single batch,
     /// but also consider `max_inference_inputs` limitation
     ///
-    /// e.g., max_wait_time: 500ms
     /// User1 request with 10 inputs arrives at 0 ms
     /// User2 request with 20 inputs arrives at 100 ms
     /// User3 request with 10 inputs arrives at 300 ms // exceeds max_inference_inputs of e.g., 32
