@@ -79,10 +79,10 @@ impl BatchProcessor {
     /// let's assume, we have such timeline, at 500th ms, we process all requests in single batch,
     /// (but also consider `max_inference_inputs` limitation)
     ///
-    /// User1 request with 10 inputs arrives at 0 ms
-    /// User2 request with 20 inputs arrives at 100 ms
-    /// User3 request with 10 inputs arrives at 300 ms // exceeds max_inference_inputs of e.g., 32
-    /// User4 request with 5 inputs arrives at 500 ms
+    /// User1 request with 10 inputs arrives at 0th ms
+    /// User2 request with 20 inputs arrives at 100th ms
+    /// User3 request with 10 inputs arrives at 300th ms // exceeds max_inference_inputs of e.g., 32
+    /// User4 request with 5 inputs arrives at 500th ms
     fn handle_max_wait_time_ms(
         pending_requests: &mut VecDeque<PendingRequest>,
         config: &AppConfig,
