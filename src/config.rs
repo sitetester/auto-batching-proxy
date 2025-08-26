@@ -93,7 +93,6 @@ impl AppConfig {
                 }
                 config.max_wait_time_ms = max_wait_time_ms;
             }
-            // max 32 check is not applied here, since different models could have different configs
             if let Some(max_batch_size) = args.max_batch_size {
                 if max_batch_size == 0 {
                     return Err("max_batch_size must be > 0".to_string());
@@ -118,6 +117,8 @@ impl AppConfig {
                 }
                 config.inference_timeout_secs = inference_timeout_secs;
             }
+
+            // max 32 check is not applied here, since each model have own configs
             if let Some(max_inference_inputs) = args.max_inference_inputs {
                 if max_inference_inputs == 0 {
                     return Err("max_inference_inputs must be > 0".to_string());
