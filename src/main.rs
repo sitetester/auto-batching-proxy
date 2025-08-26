@@ -20,21 +20,19 @@ async fn rocket() -> Rocket<Build> {
     info!("🚀 Starting auto-batching proxy server...");
 
     println!("Server Configuration:");
-    println!("  Port: {}", config.port);
+    println!("  port: {}", config.port);
     println!("  Batch Settings:");
-    println!("    Max batch size: {}", config.max_batch_size);
-    println!("    Max wait time: {}ms", config.max_wait_time_ms);
-    println!("    Check interval: {}ms", config.batch_check_interval_ms);
+    println!("    max_batch_size: {}", config.max_batch_size);
+    println!("    max_wait_time_ms: {}", config.max_wait_time_ms);
+    println!("    batch_check_interval_ms: {}", config.batch_check_interval_ms);
     println!("  Inference:");
-    println!("    URL: {}", config.inference_url);
-    println!("    Timeout: {}s", config.inference_timeout_secs);
-    println!(
-        "    Max inputs per request: {}",
-        config.max_inference_inputs
-    );
+    println!("    inference_url: {}", config.inference_url);
+    println!("    inference_timeout_secs: {}", config.inference_timeout_secs);
+    println!("    max_inference_inputs: {}", config.max_inference_inputs);
     println!("  Options:");
-    println!("    Include batch info: {}", config.include_batch_info);
-    println!("    Log level: {}", config.log_level);
+    println!("    include_batch_info: {}", config.include_batch_info);
+    println!("    log_level: {}", config.log_level);
+    println!("    quiet_mode: {}", config.quiet_mode);  // Add this too!
     println!();
 
     build_rocket(config).await
