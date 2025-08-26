@@ -165,6 +165,7 @@ impl BatchProcessor {
         }
     }
 
+    /// Sends inference service returned embeddings to each client as per given input(s)
     fn handle_batch_success(
         batch: Vec<PendingRequest>,
         embeddings: BatchResponse,
@@ -201,6 +202,7 @@ impl BatchProcessor {
         );
     }
 
+    /// Will simply send an error response
     fn handle_batch_error(batch: Vec<PendingRequest>, error: InferenceError) {
         error!("Batch processing failed: {:?}", error);
 
