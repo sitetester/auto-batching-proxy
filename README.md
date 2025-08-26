@@ -69,9 +69,10 @@ cd scripts
 **Benchmark test results:**  
 Following output is taken from 
 ```
-cargo test test_compare_single_input_inference_service_vs_auto_batching_proxy_with_30_separate_requests -- --nocapture
+$ RUSTFLAGS="-A dead_code" cargo test test_compare_single_input_inference_service_vs_auto_batching_proxy_with_x_separate_requests -- --nocapture
 ```
-[--nocapture](https://doc.rust-lang.org/cargo/commands/cargo-test.html#display-options) will recover display output 
+- `-A` shortcut for allow (to suppress warnings generated for unused functions, even though they are actually used in tests) 
+- [--nocapture](https://doc.rust-lang.org/cargo/commands/cargo-test.html#display-options) will recover display output 
 
-[Timing Summary:](./screenshots/timing_summary_full.png)
+[Full output:](./screenshots/timing_summary_full.png)
 ![timing_summary.png](screenshots/timing_summary.png)
