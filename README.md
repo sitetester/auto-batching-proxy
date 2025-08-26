@@ -9,7 +9,7 @@ Proxy server is configured with following parameters:
 _Max Wait Time_ - maximal time user request can wait for other requests to be accumulated in a batch  
 _Max Batch Size_ - maximal number of requests that can be accumulated in a batch.
 
-## Setup Inference Service
+## Setup Inference Service 
 First, try running inference service in a container with `--model-id nomic-ai/nomic-embed-text-v1.5`
 ```
 docker run --rm -it -p 8080:80 --pull always \
