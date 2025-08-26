@@ -171,10 +171,8 @@ impl BatchProcessor {
         batch_info: Option<BatchInfo>,
         start_time: Instant,
     ) {
-        let mut current_index = 0;
-
+        let mut start_idx = 0;
         for pending_request in batch {
-            let start_idx = current_index;
             let end_idx = start_idx + pending_request.inputs.len();
 
             let individual_embeddings = embeddings
@@ -192,7 +190,7 @@ impl BatchProcessor {
                 warn!("Failed to send response to client (may have disconnected)");
             }
 
-            current_index = end_idx;
+            start_idx = end_idx;
         }
 
         info!(
