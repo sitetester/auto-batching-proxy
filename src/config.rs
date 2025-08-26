@@ -49,6 +49,7 @@ pub struct AppConfig {
     pub port: u16,
     pub max_wait_time_ms: u64,
     pub max_batch_size: usize,
+    /// Very small value will cause unnecessary CUP high load, higher value will cause poor API responsiveness
     pub batch_check_interval_ms: u64,
     pub include_batch_info: bool,
     pub inference_url: String,
