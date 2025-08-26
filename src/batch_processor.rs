@@ -42,7 +42,6 @@ impl BatchProcessor {
                         // `max_inference_inputs` check is applied inside `/embed` route (routes.rs)
                         // & batch size limits are enforced in `build_safe_batch()`
                         self.pending_requests.push_back(request);
-
                         if self.pending_requests.len() >= self.config.max_batch_size {
                             self.process_pending_requests(BatchType::MaxBatchSize);
                         }
@@ -115,11 +114,7 @@ impl BatchProcessor {
 
             let mut batch_info = None;
             if self.config.include_batch_info {
-                batch_info = Some(BatchInfo::new(
-                    batch_type,
-                    batch_size,
-                    batch_wait_time_ms,
-                ));
+                batch_info = Some(BatchInfo::new(batch_type, batch_size, batch_wait_time_ms));
             }
 
             tokio::spawn(Self::process_batch(
