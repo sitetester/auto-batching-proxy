@@ -155,6 +155,7 @@ impl BatchProcessor {
         }
     }
 
+    /// It will build a batch while respecting `config.max_batch_size` & `config.max_inference_inputs`
     fn build_safe_batch(
         pending_requests: &mut VecDeque<PendingRequest>,
         config: &AppConfig,
