@@ -72,7 +72,6 @@ impl BatchProcessor {
     fn handle_max_wait_time_ms(&mut self) {
         if let Some(oldest_request) = self.pending_requests.front() {
             let received_at = oldest_request.received_at;
-
             if received_at.elapsed() >= self.config.max_wait_time_duration() {
                 info!(
                     "Processing due to config.max_wait_time_ms: {} timeout",
