@@ -46,7 +46,6 @@ pub struct Args {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-///
 pub struct AppConfig {
     pub port: u16,
     /// Maximal time user request can wait for other requests to be accumulated in a batch

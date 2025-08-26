@@ -1,7 +1,9 @@
 use crate::batch_processor::BatchProcessor;
 use crate::config::AppConfig;
 use crate::inference_client::InferenceServiceClient;
-use crate::types::{EmbedRequest, EmbedResponse, ErrorResponse, PendingRequest};
+use crate::types::{
+    EmbedRequest, EmbedResponse, ErrorResponse, OneshotReceiver, OneshotSender, PendingRequest,
+};
 use rocket::http::Status;
 use rocket::response::status::Custom;
 use rocket::serde::json::Json;
@@ -44,10 +46,8 @@ impl RequestHandler {
         request: EmbedRequest,
     ) -> Result<EmbedResponse, Custom<Json<ErrorResponse>>> {
         // create oneshot channel (only for "this particular" request
-        let (response_sender, response_receiver): (
-            oneshot::Sender<Result<EmbedResponse, Custom<Json<ErrorResponse>>>>,
-            oneshot::Receiver<Result<EmbedResponse, Custom<Json<ErrorResponse>>>>,
-        ) = oneshot::channel();
+        let (response_sender, response_receiver): (OneshotSender, OneshotReceiver) =
+            oneshot::channel();
 
         // inference service supports both single & multiple inputs per user
         let pending_request = PendingRequest::new(request.inputs, response_sender);

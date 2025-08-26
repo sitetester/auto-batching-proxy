@@ -246,8 +246,10 @@ mod tests {
 
     #[test]
     fn test_build_safe_batch_max_batch_size() {
-        let mut config = AppConfig::default();
-        config.max_batch_size = 5;
+        let config = AppConfig {
+            max_batch_size: 5,
+            ..AppConfig::default()
+        };
 
         let mut batch_processor = build_batch_processor(config);
 
@@ -264,8 +266,10 @@ mod tests {
 
     #[test]
     fn test_build_safe_batch_max_inference_inputs() {
-        let mut config = AppConfig::default();
-        config.max_inference_inputs = 10;
+        let config = AppConfig {
+            max_inference_inputs: 10,
+            ..AppConfig::default()
+        };
         let mut batch_processor = build_batch_processor(config);
 
         let inputs: Vec<String> = (1..=5).map(|i| format!("{i}: What is NLP")).collect();

@@ -2,6 +2,10 @@ use rocket::response::status::Custom;
 use rocket::serde::json::Json;
 use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicU64, Ordering};
+use tokio::sync::oneshot;
+
+pub type OneshotSender = oneshot::Sender<Result<EmbedResponse, Custom<Json<ErrorResponse>>>>;
+pub type OneshotReceiver = oneshot::Receiver<Result<EmbedResponse, Custom<Json<ErrorResponse>>>>;
 
 #[derive(Serialize, Debug, Clone)]
 pub struct ErrorResponse {
@@ -61,7 +65,7 @@ pub struct BatchRequest {
     pub inputs: Vec<String>,
 }
 impl BatchRequest {
-    pub fn prepare_request(batch: &Vec<PendingRequest>) -> BatchRequest {
+    pub fn prepare_request(batch: &[PendingRequest]) -> BatchRequest {
         let all_inputs: Vec<String> = batch
             .iter()
             .flat_map(|request| &request.inputs)
@@ -77,18 +81,12 @@ pub type BatchResponse = Vec<Vec<f32>>;
 #[derive(Debug)]
 pub struct PendingRequest {
     pub inputs: Vec<String>,
-    pub response_sender:
-        tokio::sync::oneshot::Sender<Result<EmbedResponse, Custom<Json<ErrorResponse>>>>,
+    pub response_sender: OneshotSender,
     pub received_at: std::time::Instant,
 }
 
 impl PendingRequest {
-    pub fn new(
-        inputs: Vec<String>,
-        response_sender: tokio::sync::oneshot::Sender<
-            Result<EmbedResponse, Custom<Json<ErrorResponse>>>,
-        >,
-    ) -> Self {
+    pub fn new(inputs: Vec<String>, response_sender: OneshotSender) -> Self {
         Self {
             inputs,
             response_sender,
