@@ -108,10 +108,11 @@ impl BatchProcessor {
             let batch_size = batch.len();
             info!("Processing batch size: {}", batch_size);
 
-            let mut batch_info = None;
-            if self.config.include_batch_info {
-                batch_info = Some(BatchInfo::new(batch_type, batch_size, batch_wait_time_ms));
-            }
+            let batch_info = if self.config.include_batch_info {
+                Some(BatchInfo::new(batch_type, batch_size, batch_wait_time_ms))
+            } else {
+                None
+            };
 
             tokio::spawn(Self::process_batch(
                 batch,
