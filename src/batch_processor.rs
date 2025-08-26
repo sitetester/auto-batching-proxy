@@ -77,7 +77,7 @@ impl BatchProcessor {
     /// ```Max Wait Time - maximal time user request can wait for other requests to be accumulated in a batch```
     ///
     /// let's assume, we have such timeline, at 500th ms, we process all requests in single batch,
-    /// but also consider `max_inference_inputs` limitation
+    /// (but also consider `max_inference_inputs` limitation)
     ///
     /// User1 request with 10 inputs arrives at 0 ms
     /// User2 request with 20 inputs arrives at 100 ms
