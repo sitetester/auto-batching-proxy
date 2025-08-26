@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicU64, Ordering};
 use tokio::sync::oneshot;
 
-pub type OneshotSender = oneshot::Sender<Result<EmbedResponse, Custom<Json<ErrorResponse>>>>;
-pub type OneshotReceiver = oneshot::Receiver<Result<EmbedResponse, Custom<Json<ErrorResponse>>>>;
+pub type ResponseSender = oneshot::Sender<Result<EmbedResponse, Custom<Json<ErrorResponse>>>>;
+pub type ResponseReceiver = oneshot::Receiver<Result<EmbedResponse, Custom<Json<ErrorResponse>>>>;
 
 #[derive(Serialize, Debug, Clone)]
 pub struct ErrorResponse {
@@ -81,12 +81,12 @@ pub type BatchResponse = Vec<Vec<f32>>;
 #[derive(Debug)]
 pub struct PendingRequest {
     pub inputs: Vec<String>,
-    pub response_sender: OneshotSender,
+    pub response_sender: ResponseSender,
     pub received_at: std::time::Instant,
 }
 
 impl PendingRequest {
-    pub fn new(inputs: Vec<String>, response_sender: OneshotSender) -> Self {
+    pub fn new(inputs: Vec<String>, response_sender: ResponseSender) -> Self {
         Self {
             inputs,
             response_sender,

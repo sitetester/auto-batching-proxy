@@ -230,13 +230,8 @@ mod tests {
     use crate::batch_processor::BatchProcessor;
     use crate::config::AppConfig;
     use crate::inference_client::InferenceServiceClient;
-    use crate::types::{EmbedResponse, ErrorResponse, PendingRequest};
-    use rocket::response::status::Custom;
-    use rocket::serde::json::Json;
+    use crate::types::{PendingRequest, ResponseSender};
     use tokio::sync::oneshot;
-    use tokio::sync::oneshot::Sender;
-
-    type ResponseSender = Sender<Result<EmbedResponse, Custom<Json<ErrorResponse>>>>;
 
     fn build_batch_processor(config: AppConfig) -> BatchProcessor {
         // create this client ONCE & return potential error (not possible from inside `tokio::spawn`)

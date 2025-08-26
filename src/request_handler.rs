@@ -2,7 +2,7 @@ use crate::batch_processor::BatchProcessor;
 use crate::config::AppConfig;
 use crate::inference_client::InferenceServiceClient;
 use crate::types::{
-    EmbedRequest, EmbedResponse, ErrorResponse, OneshotReceiver, OneshotSender, PendingRequest,
+    EmbedRequest, EmbedResponse, ErrorResponse, ResponseReceiver, ResponseSender, PendingRequest,
 };
 use rocket::http::Status;
 use rocket::response::status::Custom;
@@ -46,7 +46,7 @@ impl RequestHandler {
         request: EmbedRequest,
     ) -> Result<EmbedResponse, Custom<Json<ErrorResponse>>> {
         // create oneshot channel (only for "this particular" request
-        let (response_sender, response_receiver): (OneshotSender, OneshotReceiver) =
+        let (response_sender, response_receiver): (ResponseSender, ResponseReceiver) =
             oneshot::channel();
 
         // inference service supports both single & multiple inputs per user
