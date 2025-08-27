@@ -230,62 +230,48 @@ mod tests {
         // a few  other checks
         assert_eq!(config.max_wait_time_ms, defaults.max_wait_time_ms);
         assert_eq!(config.inference_url, defaults.inference_url);
-
     }
 
     #[test]
-    fn test_build_fails_when_max_batch_size_is_0() {
-        let invalid_args = Args {
-            max_batch_size: Some(0),
-            ..Args::default()
+    fn test_build_fails_when_values_are_zero() {
+        macro_rules! test_zero_fields {
+            // `[]` Outer parentheses - defines the input signature, args must match "this" ([]) syntax
+            [
+                // `$( ... )*` Repetition Group - everything inside is the repeating unit, multiple elements that repeat together
+                $(
+                    // `$field` - Metavariable - captures each input token (any valid identifier)
+                    // `:ident` - Fragment Specifier - Specifies what type of token to expect
+                    $field:ident
+                )
+                // `,` - Fields separator
+                // `*`- Repetition Quantifier (* or + or ?), here * means "zero or more"
+                ,*
+            ]
+            // `=>` - "expands to"
+            =>
+            // `{` opens the macro body
+            {
+                // ` $()*` Repetition Group, everything inside repeats for each captured field
+            $(
+                // `{}` - Scope Block - prevents variable name collisions, isolates each test case
+                {
+                    let mut args = Args::default();
+                    // Metavariable substitution
+                    args.$field = Some(0);
+                    assert!(AppConfig::build(Some(args)).is_err(),
+                           "{} should not accept 0", stringify!($field));
+                }
+            )*
         };
-
-        let config = AppConfig::build(Some(invalid_args));
-        assert!(config.is_err());
     }
-
-    #[test]
-    fn test_build_fails_when_max_wait_time_ms_is_0() {
-        let invalid_args = Args {
-            max_wait_time_ms: Some(0),
-            ..Args::default()
-        };
-
-        let config = AppConfig::build(Some(invalid_args));
-        assert!(config.is_err());
-    }
-
-    #[test]
-    fn test_build_fails_when_batch_check_interval_ms_is_0() {
-        let invalid_args = Args {
-            batch_check_interval_ms: Some(0),
-            ..Args::default()
-        };
-
-        let config = AppConfig::build(Some(invalid_args));
-        assert!(config.is_err());
-    }
-
-    #[test]
-    fn test_build_fails_when_inference_timeout_secs_is_0() {
-        let invalid_args = Args {
-            inference_timeout_secs: Some(0),
-            ..Args::default()
-        };
-
-        let config = AppConfig::build(Some(invalid_args));
-        assert!(config.is_err());
-    }
-
-    #[test]
-    fn test_build_fails_when_max_inference_inputs_is_0() {
-        let invalid_args = Args {
-            max_inference_inputs: Some(0),
-            ..Args::default()
-        };
-
-        let config = AppConfig::build(Some(invalid_args));
-        assert!(config.is_err());
+        // because macro was defined as `[]`, but not `()`
+        test_zero_fields![
+            max_batch_size,
+            max_wait_time_ms,
+            batch_check_interval_ms,
+            inference_timeout_secs,
+            max_inference_inputs
+        ];
     }
 
     #[tokio::test] // Must be ```tokio::``` prefixed
