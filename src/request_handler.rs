@@ -89,9 +89,6 @@ impl RequestHandler {
                 }),
             )
         })?
-        // => Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, Custom<Json<ErrorResponse>>>
-        // Result<EmbedResponse, Custom<Json<ErrorResponse>>>
-        // (? unwrapped outer layer, early return if timeout)
-        // which is the return type of `process_request(...)`
+        // as above, final unwrapped Result is the target return type
     }
 }
