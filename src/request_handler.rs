@@ -27,8 +27,8 @@ impl RequestHandler {
         ) = mpsc::unbounded_channel(); // non-blocking
 
         // create this client once & return potential error
-        let inference_client = InferenceServiceClient::new(&config)
-            .map_err(|e| anyhow::anyhow!("Failed to create InferenceServiceClient: {}", e))?;
+        let inference_client =
+            InferenceServiceClient::new(&config).map_err(|e| anyhow::anyhow!(e.message()))?;
 
         let batch_processor = BatchProcessor::new(config.clone(), inference_client);
         // launch `run` as a background task

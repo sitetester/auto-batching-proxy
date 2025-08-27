@@ -1,6 +1,5 @@
 use crate::config::AppConfig;
 use crate::types::{BatchRequest, BatchResponse};
-use anyhow::{Result, anyhow};
 use log::debug;
 use reqwest::Error;
 use rocket::http::Status;
@@ -44,11 +43,11 @@ pub struct InferenceServiceClient {
 }
 
 impl InferenceServiceClient {
-    pub fn new(config: &AppConfig) -> Result<Self> {
+    pub fn new(config: &AppConfig) -> Result<Self, InferenceError> {
         let client = reqwest::Client::builder()
             .timeout(Duration::from_secs(config.inference_timeout_secs))
             .build()
-            .map_err(|e| anyhow!("Failed to create HTTP client: {}", e))?;
+            .map_err(InferenceError::NetworkError)?;
 
         Ok(Self {
             client,
