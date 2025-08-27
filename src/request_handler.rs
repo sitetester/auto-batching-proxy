@@ -79,8 +79,8 @@ impl RequestHandler {
             )
         })?;
         // => Result<Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>, Custom<Json<ErrorResponse>>>
-        // Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>
         // (? unwrapped outer layer, early return if timeout)
+        // Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>
         after_timeout_check.map_err(|_| {
             Custom(
                 Status::InternalServerError,
