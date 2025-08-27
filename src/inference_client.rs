@@ -19,11 +19,9 @@ impl InferenceError {
     pub fn to_rocket_status(&self) -> Status {
         match self {
             InferenceError::NetworkError(_) => Status::ServiceUnavailable,
-            InferenceError::HttpError { status, .. } => match status.as_u16() {
-                400..=499 => Status::BadRequest,
-                500..=599 => Status::ServiceUnavailable,
-                _ => Status::InternalServerError,
-            },
+            InferenceError::HttpError { status, .. } => {
+                Status::from_code(status.as_u16()).unwrap_or(Status::InternalServerError)
+            }
             InferenceError::ParseError(_) => Status::InternalServerError,
         }
     }
