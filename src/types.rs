@@ -57,7 +57,7 @@ impl BatchInfo {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct EmbedResponse {
     pub embeddings: Vec<Vec<f32>>,
-    #[serde(skip_serializing_if = "Option::is_none")] // don't show when None
+    #[serde(skip_serializing_if = "Option::is_none")] // hide when None
     pub batch_info: Option<BatchInfo>,
 }
 
