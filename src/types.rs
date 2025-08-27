@@ -14,6 +14,7 @@ pub struct ErrorResponse {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct EmbedRequest {
+    /// Inference service supports both single & multiple inputs per user
     pub inputs: Vec<String>,
 }
 

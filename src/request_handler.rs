@@ -49,7 +49,6 @@ impl RequestHandler {
         let (response_sender, response_receiver): (ResponseSender, ResponseReceiver) =
             oneshot::channel();
 
-        // inference service supports both single & multiple inputs per user
         let pending_request = PendingRequest::new(request.inputs, response_sender);
 
         self.request_sender.send(pending_request).map_err(|_| {
