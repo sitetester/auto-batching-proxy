@@ -61,7 +61,7 @@ impl RequestHandler {
         })?;
 
         // for individual request handling
-        // this is different from `--max-wait-time-ms x` which is for our proxy batch execution delay time
+        // this is different from `--max-wait-time-ms` which is for our proxy batch execution delay time
         let request_timeout = self.config.max_wait_time_duration() + Duration::from_secs(30);
 
         // without `timeout`, requests could hang indefinitely, just in case:
