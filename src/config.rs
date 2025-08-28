@@ -20,7 +20,7 @@ pub struct Args {
     pub max_batch_size: Option<usize>,
 
     /// How often it can apply pending requests age check
-    /// Smaller value will cause unnecessary CPU load, higher value will cause poor API response
+    /// Smaller value will cause unnecessary CPU load, higher will cause poor API response
     #[arg(long)]
     pub batch_check_interval_ms: Option<u64>,
 
