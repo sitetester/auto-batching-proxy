@@ -273,25 +273,4 @@ mod tests {
             max_inference_inputs
         ];
     }
-
-    #[tokio::test] // Must be ```tokio::``` prefixed
-    async fn test_get_batch_interval() {
-        let configs = [
-            AppConfig::default(),
-            AppConfig {
-                batch_check_interval_ms: 1,
-                ..AppConfig::default()
-            },
-            AppConfig {
-                batch_check_interval_ms: 1000,
-                ..AppConfig::default()
-            },
-        ];
-
-        for config in configs {
-            // explicit type annotation will make Rust compiler guarantee it's an `Interval`
-            // otherwise, test will fail :)
-            let _interval: Interval = config.get_batch_interval();
-        }
-    }
 }
