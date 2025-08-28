@@ -66,7 +66,6 @@ impl RequestHandler {
 
         // without `timeout`, requests could hang indefinitely, just in case:
         // batch processor gets stuck or downstream inference service becomes unresponsive
-        // check ```response_sender.send(Ok(response))``` in batch_processor
         // EmbedResponse & Custom<Json<ErrorResponse>>> come from `handle_batch_success`, `handle_batch_error`
         // Result<Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>, Elapsed>
         let timeout_result = timeout(request_timeout, response_receiver).await;
