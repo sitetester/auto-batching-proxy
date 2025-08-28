@@ -36,7 +36,9 @@ pub async fn embed(
         ));
     }
 
-    let embed_response = request_handler.process_request(request.into_inner()).await?;
+    let embed_response = request_handler
+        .process_request(request.into_inner())
+        .await?;
     Ok(Json(embed_response))
 }
 
