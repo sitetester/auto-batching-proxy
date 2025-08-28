@@ -15,6 +15,7 @@ use std::sync::Arc;
 
 /// Only catches errors that aren't explicitly handled,
 /// has lower priority than custom responders, i.e., custom error handling bypasses this global catcher
+/// Also to make sure, Rocket internals return consistent JSON instead of default HTML error pages
 #[catch(default)]
 fn json_error_catcher(status: Status, _req: &Request) -> Json<ErrorResponse> {
     Json(ErrorResponse {
