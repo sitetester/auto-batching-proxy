@@ -1,3 +1,4 @@
+use crate::config::AppConfig;
 use rocket::response::status::Custom;
 use rocket::serde::json::Json;
 use serde::{Deserialize, Serialize};
@@ -39,18 +40,25 @@ pub struct BatchInfo {
 pub static BATCH_COUNTER: AtomicU64 = AtomicU64::new(1);
 
 impl BatchInfo {
-    pub fn new(
-        batch_type: BatchType,
-        batch_size: usize,
-        batch_wait_time_ms: Option<u64>,
-    ) -> BatchInfo {
-        BatchInfo {
-            batch_id: BATCH_COUNTER.fetch_add(1, Ordering::Relaxed),
-            batch_type,
-            batch_size: Some(batch_size),
-            batch_wait_time_ms,
-            inference_time_ms: None, // filled later in `process_batch`
+    pub fn new(config: &AppConfig, batch_type: BatchType, batch_size: usize) -> Option<BatchInfo> {
+        let batch_wait_time_ms = if batch_type == BatchType::MaxWaitTimeMs {
+            Some(config.max_wait_time_ms)
+        } else {
+            // to avoid confusion (whether size or timing), let's not show this info in returned
+            // BatchInfo results in tests, also check ```skip_serializing_if = "Option::is_none"```
+            None
+        };
+
+        if config.include_batch_info {
+            return Some(BatchInfo {
+                batch_id: BATCH_COUNTER.fetch_add(1, Ordering::Relaxed),
+                batch_type,
+                batch_size: Some(batch_size),
+                batch_wait_time_ms,
+                inference_time_ms: None, // filled later in `process_batch`
+            });
         }
+        None
     }
 }
 

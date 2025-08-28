@@ -92,13 +92,6 @@ impl BatchProcessor {
     fn process_pending_requests(&mut self, batch_type: BatchType) {
         info!("Processing batch type: {batch_type:?}...");
 
-        let mut batch_wait_time_ms = Some(self.config.max_wait_time_ms);
-        if batch_type == BatchType::MaxBatchSize {
-            // to avoid confusion (whether size or timing), let's not show this info in returned
-            // BatchInfo results in tests, also check ```skip_serializing_if = "Option::is_none"```
-            batch_wait_time_ms = None;
-        }
-
         while !self.pending_requests.is_empty() {
             let batch = self.build_safe_batch();
             if batch.is_empty() {
@@ -112,12 +105,7 @@ impl BatchProcessor {
             let batch_size = batch.len();
             info!("Processing batch size: {batch_size}");
 
-            let batch_info = if self.config.include_batch_info {
-                Some(BatchInfo::new(batch_type, batch_size, batch_wait_time_ms))
-            } else {
-                None
-            };
-
+            let batch_info = BatchInfo::new(&self.config, batch_type, batch_size);
             tokio::spawn(Self::process_batch(
                 batch,
                 self.inference_client.clone(),
