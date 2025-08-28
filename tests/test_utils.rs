@@ -70,7 +70,7 @@ pub async fn launch_threads_with_tests(
                 for (i, embedding) in embeddings.iter().enumerate() {
                     assert!(
                         embedding.is_array(),
-                        "Embedding {i} should be an array of numbers"
+                        "Embedding {i} should be an array"
                     );
 
                     let embedding_values = embedding.as_array().unwrap();
