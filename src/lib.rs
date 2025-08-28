@@ -41,9 +41,8 @@ pub async fn build_rocket(app_config: AppConfig) -> Rocket<Build> {
     );
 
     rocket::build()
-        // once managed, this Arc<RequestHandler> instance is available to any route handler that declares it as a
-        // parameter with the State guard
-        // same Arc<RequestHandler> instance is shared across all requests
+        // available to any route handler via `State<T>` param
+        // same instance is shared across all requests
         .manage(handler)
         .mount("/", rocket::routes![routes::health, routes::embed])
         .register("/", rocket::catchers![json_error_catcher])
