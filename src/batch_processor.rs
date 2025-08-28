@@ -127,6 +127,7 @@ impl BatchProcessor {
     }
 
     /// It will build a batch while respecting `config.max_batch_size` & `config.max_inference_inputs`
+    /// Some requests might come with MANY inputs
     fn build_safe_batch(&mut self) -> Vec<PendingRequest> {
         let mut batch_size = 0;
         let mut inputs_count = 0;
