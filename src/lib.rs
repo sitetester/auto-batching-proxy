@@ -23,7 +23,7 @@ fn json_error_catcher(status: Status, _req: &Request) -> Json<ErrorResponse> {
     })
 }
 
-/// Builds and configures a Rocket application instance.
+/// Builds and configures a Rocket application instance
 /// Accessible from application as well as tests
 pub async fn build_rocket(app_config: AppConfig) -> Rocket<Build> {
     let port = app_config.port;
