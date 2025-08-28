@@ -208,7 +208,7 @@ mod embed_functionality_tests {
                     client.clone(),
                     num_requests,
                     Arc::new(build_inputs(1, None)),
-                    false,
+                    false, // skip running assertions to optimise performance
                 )
                 .await;
                 proxy_timings.insert(num_requests, start_time.elapsed());
