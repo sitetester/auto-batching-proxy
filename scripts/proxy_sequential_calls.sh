@@ -9,6 +9,6 @@ done
 
 # Wait for all background jobs to complete
 wait
-# Check proxy logs to verify these are indeed handled by proxy
+# It should give output
 echo "All requests completed!"
 
