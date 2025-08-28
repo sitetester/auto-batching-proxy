@@ -29,7 +29,7 @@ impl InferenceError {
         match self {
             InferenceError::NetworkError(e) => format!("Network error: {e}"),
             InferenceError::HttpError { status, body } => {
-                format!("HTTP {status}: {body}")
+                format!("HTTP error: {status}: {body}")
             }
             InferenceError::ParseError(e) => format!("Parse error: {e}"),
         }
