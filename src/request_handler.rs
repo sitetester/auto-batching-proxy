@@ -51,11 +51,11 @@ impl RequestHandler {
 
         let pending_request = PendingRequest::new(request.inputs, response_sender);
 
-        self.request_sender.send(pending_request).map_err(|_| {
+        self.request_sender.send(pending_request).map_err(|err| {
             Custom(
                 Status::InternalServerError,
                 Json(ErrorResponse {
-                    error: "Failed to queue request".to_string(),
+                    error: format!("Failed to queue request: {err:?}"),
                 }),
             )
         })?;
