@@ -49,7 +49,7 @@ impl BatchInfo {
             batch_type,
             batch_size: Some(batch_size),
             batch_wait_time_ms,
-            inference_time_ms: None, // filled later in process_batch(...)
+            inference_time_ms: None, // filled later in `process_batch`
         }
     }
 }

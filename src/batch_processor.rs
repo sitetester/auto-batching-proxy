@@ -48,8 +48,8 @@ impl BatchProcessor {
                     }
                 }
                 // imagine only 1 request arrived, but then there are no new requests,
-                // can cause timeout without even executing `handle_max_wait_time_ms(...)` for older requests,
-                // having ticker ensures, this branch runs & eventually processes `handle_max_wait_time_ms(...)`
+                // can cause timeout without even executing `handle_max_wait_time_ms` for older requests,
+                // having ticker ensures, this branch runs & eventually processes `handle_max_wait_time_ms`
                 _ = batch_interval.tick() => {
                    // periodic wakeup to check pending requests
                 }
@@ -187,7 +187,7 @@ impl BatchProcessor {
                 batch_info: batch_info.clone(),
             };
 
-            // this call is handled by ```timeout(request_timeout, response_receiver).await;``` in process_request(...)
+            // this call is handled by ```timeout(request_timeout, response_receiver).await;``` in `process_request`
             if pending_request.response_sender.send(Ok(response)).is_err() {
                 warn!("Failed to send response to client (may have disconnected)");
             }
