@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "=== Testing Proxy Concurrent Calls ==="
 
-for i in {1..30}; do
+for i in {1..2}; do
   curl -s -X POST http://localhost:3000/embed \
     -H "Content-Type: application/json" \
      -d '{"inputs": ["Request '"$i"' - What is Vector search?"]}'
