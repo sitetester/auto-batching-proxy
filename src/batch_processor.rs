@@ -180,6 +180,7 @@ impl BatchProcessor {
                 batch_info: batch_info.clone(),
             };
 
+            // check `EmbedResponse` in `timeout_result` (process_request)
             if pending_request.response_sender.send(Ok(response)).is_err() {
                 warn!("Failed to send response to client (may have disconnected)");
             }
@@ -198,6 +199,7 @@ impl BatchProcessor {
     fn handle_batch_error(batch: Vec<PendingRequest>, error: InferenceError) {
         error!("Batch processing failed: {error:?}");
 
+        // check `Custom<Json<ErrorResponse>>>` in `timeout_result` (process_request)
         let error_response = Custom(
             error.to_rocket_status(),
             Json(ErrorResponse {

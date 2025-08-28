@@ -67,9 +67,9 @@ impl RequestHandler {
         // without `timeout`, requests could hang indefinitely, just in case:
         // batch processor gets stuck or downstream inference service becomes unresponsive
         // check ```response_sender.send(Ok(response))``` in batch_processor
-        let timeout_result = timeout(request_timeout, response_receiver).await;
-
+        // EmbedResponse & Custom<Json<ErrorResponse>>> come from `handle_batch_success`, `handle_batch_error`
         // Result<Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>, Elapsed>
+        let timeout_result = timeout(request_timeout, response_receiver).await;
         let after_timeout_check = timeout_result.map_err(|_| {
             Custom(
                 Status::RequestTimeout,
@@ -80,7 +80,7 @@ impl RequestHandler {
         })?;
         // => Result<Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>, Custom<Json<ErrorResponse>>>
         // (? unwrapped outer layer, early return if timeout)
-        // Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>
+        // => Result<Result<EmbedResponse, Custom<Json<ErrorResponse>>>, RecvError>
         after_timeout_check.map_err(|_| {
             Custom(
                 Status::InternalServerError,
