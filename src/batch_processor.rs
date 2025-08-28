@@ -180,7 +180,6 @@ impl BatchProcessor {
                 batch_info: batch_info.clone(),
             };
 
-            // this call is handled by ```timeout(request_timeout, response_receiver).await;``` in `process_request`
             if pending_request.response_sender.send(Ok(response)).is_err() {
                 warn!("Failed to send response to client (may have disconnected)");
             }
