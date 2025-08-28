@@ -43,7 +43,7 @@ pub async fn embed(
 /// GET /health - Health check endpoint
 ///
 /// Returns "OK" if the service is running.
-/// Used by load balancers and monitoring systems.
+/// Could be used by load balancers and monitoring systems.
 #[get("/health")]
 pub fn health() -> &'static str {
     "OK"
