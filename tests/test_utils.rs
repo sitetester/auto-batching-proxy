@@ -40,10 +40,11 @@ pub async fn post_json<'a>(
 pub async fn launch_threads_with_tests(
     client: Arc<Client>,
     num: usize,
-    inputs: Arc<Vec<String>>,
+    inputs: Vec<String>,
     run_assertions: bool,
 ) -> Vec<Value> {
     let mut handles = Vec::new();
+    let inputs = Arc::new(inputs);
     for _ in 1..=num {
         let client = client.clone();
         let inputs = inputs.clone();

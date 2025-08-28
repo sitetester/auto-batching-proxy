@@ -60,13 +60,8 @@ mod embed_functionality_tests {
             };
 
             let client = Arc::new(get_client(config).await);
-            let batches_info = launch_threads_with_tests(
-                client.clone(),
-                7,
-                Arc::new(build_inputs(num, None)),
-                true,
-            )
-            .await;
+            let batches_info =
+                launch_threads_with_tests(client.clone(), 7, build_inputs(num, None), true).await;
             assert_eq!(batches_info.len(), 7);
 
             assert_eq!(count_batch(&batches_info, BatchType::MaxBatchSize, 5,), 5); // first batch
@@ -94,13 +89,8 @@ mod embed_functionality_tests {
 
             let client = Arc::new(get_client(config).await);
             // launch 7 requests, each with 10 inputs, total 7 * 10 = 70 inputs
-            let batches_info = launch_threads_with_tests(
-                client.clone(),
-                7,
-                Arc::new(build_inputs(10, None)),
-                true,
-            )
-            .await;
+            let batches_info =
+                launch_threads_with_tests(client.clone(), 7, build_inputs(10, None), true).await;
             assert_eq!(batches_info.len(), 7);
 
             // hence, these will be split into 3 batches respecting `config.max_inference_inputs`
@@ -131,7 +121,7 @@ mod embed_functionality_tests {
 
             let client = Arc::new(get_client(config).await);
             let batches_info =
-                launch_threads_with_tests(client, 3, Arc::new(build_inputs(num, None)), true).await;
+                launch_threads_with_tests(client, 3, build_inputs(num, None), true).await;
             assert_eq!(batches_info.len(), 3);
 
             assert_eq!(count_batch(&batches_info, BatchType::MaxWaitTimeMs, 3), 3);
@@ -157,13 +147,8 @@ mod embed_functionality_tests {
             };
 
             let client = Arc::new(get_client(config).await);
-            let batches_info = launch_threads_with_tests(
-                client.clone(),
-                7,
-                Arc::new(build_inputs(10, None)),
-                true,
-            )
-            .await;
+            let batches_info =
+                launch_threads_with_tests(client.clone(), 7, build_inputs(10, None), true).await;
             assert_eq!(batches_info.len(), 7);
 
             assert_eq!(count_batch(&batches_info, BatchType::MaxWaitTimeMs, 3), 6); // first & second batch
@@ -207,7 +192,7 @@ mod embed_functionality_tests {
                 launch_threads_with_tests(
                     client.clone(),
                     num_requests,
-                    Arc::new(build_inputs(1, None)),
+                    build_inputs(1, None),
                     false, // skip running assertions to optimise performance
                 )
                 .await;
