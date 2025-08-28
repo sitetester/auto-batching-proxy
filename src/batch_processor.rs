@@ -86,6 +86,9 @@ impl BatchProcessor {
 
     /// To avoid overwhelming the inference service, it will process in batches
     /// respecting `config.max_batch_size` as well as `config.max_inference_inputs`
+    ///
+    /// The while loop will run to completion before yielding control back to the tokio::select!
+    /// that could receive new requests (both running on single thread)
     fn process_pending_requests(&mut self, batch_type: BatchType) {
         info!("Processing batch type: {batch_type:?}...");
 
