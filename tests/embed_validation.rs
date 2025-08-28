@@ -40,12 +40,19 @@ async fn test_embed_endpoint_empty_inputs() {
     )
     .await;
     assert_eq!(response.status(), Status::BadRequest);
+
+    let body: Value = response.into_json().await.expect("Valid JSON");
+    assert!(body.is_object());
+    assert!(body["error"].is_string());
+    assert_eq!(body["error"], "`inputs` can't be empty");
 }
 
 #[tokio::test]
 async fn test_embed_endpoint_fails_when_inputs_exceed_config_max_inference_inputs() {
-    let mut config = AppConfig::default();
-    config.max_inference_inputs = 20;
+    let config = AppConfig {
+        max_inference_inputs: 20,
+        ..Default::default()
+    };
 
     let inputs = build_inputs(25, None);
     let client = get_client(config).await;
