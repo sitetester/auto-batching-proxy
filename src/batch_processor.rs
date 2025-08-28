@@ -78,6 +78,7 @@ impl BatchProcessor {
                     self.config.max_wait_time_ms
                 );
                 debug!("Oldest request waited {elapsed:?}");
+                // start processing ALL pending requests (in safe batches)
                 self.process_pending_requests(BatchType::MaxWaitTimeMs);
             }
         }
