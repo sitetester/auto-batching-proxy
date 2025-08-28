@@ -144,7 +144,7 @@ pub fn count_batch(batches_info: &Vec<Value>, batch_type: BatchType, size: usize
     batches_info
         .iter()
         .filter(|batch_info| {
-            // deserialize the JSON value to BatchType
+            // deserialize the JSON value to BatchInfo
             let batch_info_result: Result<BatchInfo, _> =
                 serde_json::from_value((*batch_info).clone());
 
