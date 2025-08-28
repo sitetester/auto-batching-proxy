@@ -41,7 +41,7 @@ async fn test_embed_endpoint_success_multiple_inputs_using_defaults() {
 }
 
 // --- max_batch_size - start ---
-// here we assume, inputs are within `config.max_inference_inputs = 32` range
+// here we assume inputs are within `config.max_inference_inputs = 32` range
 async fn max_batch_size_should_process_first_with_num_inputs_per_request(num: usize) {
     let config = AppConfig {
         include_batch_info: true,
@@ -100,7 +100,7 @@ async fn test_embed_endpoint_max_batch_size_while_exceeding_max_inference_inputs
 // max_batch_size - end
 
 // --- max_wait_time_ms - start ---
-// here we assume, inputs are within `config.max_inference_inputs = 32` range
+// here we assume inputs are within `config.max_inference_inputs = 32` range
 async fn max_wait_time_ms_should_process_first_with_num_inputs_per_request(num: usize) {
     let config = AppConfig {
         include_batch_info: true,
