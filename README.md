@@ -1,6 +1,6 @@
 # Auto Batching Proxy
 
-It will automatically batch inference requests from independent users together in a single batch request for efficiency, so that for users the interface looks like individual requests, but internally it is handled as a batch 
+It will automatically batch inference requests from independent users in a single batch request for efficiency, so that for users the interface looks like individual requests, but internally it is handled as a batch 
 request, essentially it provide a REST API wrapper around some inference service like https://github.com/huggingface/text-embeddings-inference
 
 
